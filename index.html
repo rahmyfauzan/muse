@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<!-- ============================================================
+  index.html — Personal site v1 untuk Rahmy Fauzanibudi Ahmad
+  Single-file, vanilla JS, tanpa build step. Semua gaya & logika
+  inline agar bisa dibuka langsung dari file:// sekalipun.
+
+  Tema: Ceria (playful), Neon (cyber), Minimal (elegan) — diganti
+  lewat tombol switcher, memakai CSS variables + perilaku JS.
+  Data pada halaman HANYA dari fakta GitHub terverifikasi.
+============================================================ -->
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rahmy Fauzanibudi Ahmad — Personal Site</title>
+<meta name="description" content="Halaman personal Rahmy Fauzanibudi Ahmad — proyek, keahlian, dan kontak.">
+<!-- Google Fonts diizinkan sebagai satu-satunya CDN -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+/* ==================== BASE ==================== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* nilai default = tema Ceria; dioverride per [data-theme] */
+  --bg:#fdf6ff; --bg-soft:#ffffff; --ink:#1d1030; --ink-soft:#5b4a7a;
+  --accent:#ff4d8d; --accent2:#7c3aed; --accent3:#22d3ee;
+  --card:#ffffff; --line:rgba(29,16,48,.12);
+  --shadow:0 18px 50px -18px rgba(124,58,237,.35);
+  --font-head:'Space Grotesk',sans-serif; --font-body:'Inter',sans-serif;
+  --radius:22px; --nav-h:64px;
+  --ease:cubic-bezier(.34,1.56,.64,1); /* bouncy ala Ceria */
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body); background:var(--bg); color:var(--ink);
+  line-height:1.7; overflow-x:hidden; transition:background .6s ease,color .6s ease;
+  min-height:100vh;
+}
+::selection{background:var(--accent);color:#fff}
+img{max-width:100%}
+a{color:inherit}
+.container{width:min(1080px,92%);margin:0 auto}
+
+/* ---------- Tema NEON ---------- */
+[data-theme="neon"]{
+  --bg:#050510; --bg-soft:#0a0a1c; --ink:#e8f6ff; --ink-soft:#8ea3c9;
+  --accent:#00f0ff; --accent2:#ff2fd6; --accent3:#a3ff12;
+  --card:rgba(14,14,32,.82); --line:rgba(0,240,255,.16);
+  --shadow:0 0 34px -6px rgba(0,240,255,.35);
+  --font-head:'Space Grotesk',sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+/* ---------- Tema MINIMAL ---------- */
+[data-theme="minimal"]{
+  --bg:#faf9f6; --bg-soft:#ffffff; --ink:#141414; --ink-soft:#6f6a63;
+  --accent:#141414; --accent2:#8a7a5c; --accent3:#c9c2b4;
+  --card:#ffffff; --line:rgba(20,20,20,.14);
+  --shadow:0 24px 60px -30px rgba(20,20,20,.25);
+  --font-head:'Playfair Display',serif;
+  --ease:cubic-bezier(.22,1,.36,1); /* halus sinematik */
+}
+
+/* ==================== PRELOADER ==================== */
+#preloader{
+  position:fixed;inset:0;z-index:2000;display:flex;flex-direction:column;gap:18px;
+  align-items:center;justify-content:center;background:var(--bg);
+  transition:opacity .6s ease,visibility .6s;
+}
+#preloader.done{opacity:0;visibility:hidden}
+.loader-name{font-family:var(--font-head);font-size:clamp(1.4rem,4vw,2.2rem);font-weight:700;letter-spacing:.04em}
+.loader-bar{width:min(320px,70vw);height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.loader-fill{height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.loader-pct{font-size:.85rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+
+/* ==================== CUSTOM CURSOR ==================== */
+.cursor-dot,.cursor-glow{position:fixed;top:0;left:0;pointer-events:none;z-index:1500;border-radius:50%}
+.cursor-dot{width:10px;height:10px;background:var(--accent);transform:translate(-50%,-50%)}
+.cursor-glow{width:44px;height:44px;border:2px solid var(--accent);opacity:.55;
+  transform:translate(-50%,-50%);transition:width .25s,height .25s,opacity .25s}
+body.cursor-hover .cursor-glow{width:70px;height:70px;opacity:.9}
+@media (hover:none),(pointer:coarse){.cursor-dot,.cursor-glow{display:none}}
+
+/* ==================== BACKGROUND LAYERS ==================== */
+#bg-canvas{position:fixed;inset:0;z-index:-2;display:none}
+[data-theme="neon"] #bg-canvas{display:block}
+.blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;display:none}
+[data-theme="ceria"] .blobs{display:block}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;animation:drift 18s ease-in-out infinite alternate}
+.blob.b1{width:44vw;height:44vw;left:-10vw;top:-12vh;background:#ffb3d9}
+.blob.b2{width:36vw;height:36vw;right:-8vw;top:22vh;background:#c4b5fd;animation-delay:-6s}
+.blob.b3{width:30vw;height:30vw;left:22vw;bottom:-14vh;background:#99f6e4;animation-delay:-12s}
+@keyframes drift{to{transform:translate(6vw,5vh) scale(1.15) rotate(20deg)}}
+
+/* ==================== NAVBAR ==================== */
+nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:1000;
+  display:flex;align-items:center;backdrop-filter:blur(14px);
+  background:color-mix(in srgb,var(--bg) 72%,transparent);
+  border-bottom:1px solid var(--line)}
+.nav-inner{width:min(1080px,92%);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--font-head);font-weight:700;font-size:1.05rem;letter-spacing:.02em;text-decoration:none}
+.brand span{color:var(--accent)}
+.nav-links{display:flex;gap:4px;list-style:none}
+.nav-links a{text-decoration:none;font-size:.92rem;font-weight:500;color:var(--ink-soft);
+  padding:8px 14px;border-radius:99px;transition:all .3s}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a.active{background:var(--accent);color:#fff}
+.theme-switch{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);
+  border-radius:99px;padding:4px;box-shadow:var(--shadow)}
+.theme-switch button{border:0;background:transparent;color:var(--ink-soft);font:600 .78rem var(--font-body);
+  padding:7px 13px;border-radius:99px;cursor:pointer;transition:all .3s}
+.theme-switch button.active{background:var(--accent);color:#fff;transform:scale(1.05)}
+@media(max-width:760px){.nav-links{display:none}}
+
+/* ==================== HERO ==================== */
+header.hero{min-height:100svh;display:flex;align-items:center;position:relative;padding:calc(var(--nav-h) + 40px) 0 60px}
+.hero-inner{width:min(1080px,92%);margin:0 auto}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.eyebrow::before{content:"";width:34px;height:2px;background:var(--accent);display:inline-block}
+.hero h1{font-family:var(--font-head);font-weight:700;
+  font-size:clamp(2.4rem,7.5vw,5.2rem);line-height:1.08;letter-spacing:-.01em;min-height:2.3em}
+[data-theme="minimal"] .hero h1{font-weight:900;font-style:italic}
+/* typewriter caret */
+.caret{display:inline-block;width:.55ch;color:var(--accent);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+/* glitch khusus Neon */
+[data-theme="neon"] .glitch{position:relative;display:inline-block;text-shadow:0 0 18px var(--accent)}
+[data-theme="neon"] .glitch::before,[data-theme="neon"] .glitch::after{
+  content:attr(data-text);position:absolute;inset:0;overflow:hidden}
+[data-theme="neon"] .glitch::before{color:var(--accent2);animation:gl1 2.4s infinite linear alternate;clip-path:inset(0 0 55% 0)}
+[data-theme="neon"] .glitch::after{color:var(--accent3);animation:gl2 3.1s infinite linear alternate;clip-path:inset(60% 0 0 0)}
+@keyframes gl1{0%{transform:translate(0)}20%{transform:translate(-4px,2px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-2px,-2px)}100%{transform:translate(0)}}
+@keyframes gl2{0%{transform:translate(0)}25%{transform:translate(4px,-2px)}50%{transform:translate(-3px,2px)}75%{transform:translate(2px,1px)}100%{transform:translate(0)}}
+.roles{margin-top:14px;font-size:clamp(1.05rem,2.6vw,1.5rem);color:var(--ink-soft);font-weight:500;min-height:2em}
+.roles .role-word{color:var(--accent);font-weight:700;display:inline-block;transition:opacity .35s,transform .35s}
+.roles .role-word.swap{opacity:0;transform:translateY(10px)}
+.hero-desc{margin-top:16px;max-width:56ch;color:var(--ink-soft)}
+.cta-row{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+.btn{position:relative;display:inline-flex;align-items:center;gap:10px;text-decoration:none;
+  font:600 1rem var(--font-body);padding:15px 30px;border-radius:99px;cursor:pointer;
+  transition:transform .25s var(--ease),box-shadow .3s;will-change:transform}
+.btn-primary{background:linear-gradient(120deg,var(--accent),var(--accent2));color:#fff;box-shadow:var(--shadow)}
+[data-theme="minimal"] .btn-primary{background:var(--ink)}
+.btn-ghost{border:2px solid var(--line);color:var(--ink);background:var(--bg-soft)}
+.btn:hover{transform:translateY(-3px)}
+.scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+  color:var(--ink-soft);font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;
+  display:flex;flex-direction:column;align-items:center;gap:8px}
+.scroll-hint::after{content:"";width:2px;height:44px;background:linear-gradient(var(--accent),transparent);
+  animation:drop 1.8s ease-in-out infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ==================== MARQUEE ==================== */
+.marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  background:var(--bg-soft);padding:14px 0;white-space:nowrap}
+.marquee-track{display:inline-flex;gap:48px;animation:scrollX 22s linear infinite;padding-right:48px}
+.marquee span{font-family:var(--font-head);font-weight:700;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase}
+.marquee span i{font-style:normal;color:var(--accent);margin-right:48px}
+@keyframes scrollX{to{transform:translateX(-50%)}}
+
+/* ==================== SECTIONS ==================== */
+section{padding:110px 0;position:relative}
+.sec-head{margin-bottom:54px}
+.sec-tag{font-size:.8rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--accent)}
+.sec-title{font-family:var(--font-head);font-weight:700;font-size:clamp(1.9rem,4.5vw,3rem);margin-top:10px}
+[data-theme="minimal"] .sec-title{font-style:italic;font-weight:900}
+.divider{height:1px;background:var(--line);margin:26px 0}
+
+/* reveal on scroll */
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.1s}.reveal.d2{transition-delay:.2s}.reveal.d3{transition-delay:.3s}
+
+/* ==================== TENTANG ==================== */
+.about-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:44px;align-items:start}
+@media(max-width:820px){.about-grid{grid-template-columns:1fr}}
+.about-grid p{color:var(--ink-soft);margin-bottom:16px}
+.about-grid p strong{color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px 14px;text-align:center;box-shadow:var(--shadow)}
+.stat b{display:block;font-family:var(--font-head);font-size:2rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.stat small{color:var(--ink-soft);font-size:.8rem}
+
+/* ==================== PROYEK ==================== */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px;perspective:1200px}
+.proj-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:28px 24px;text-decoration:none;display:flex;flex-direction:column;gap:12px;
+  box-shadow:var(--shadow);transition:box-shadow .35s;transform-style:preserve-3d;will-change:transform}
+.proj-card:hover{box-shadow:0 30px 70px -20px var(--accent)}
+.proj-card .lang{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2)}
+.proj-card h3{font-family:var(--font-head);font-size:1.35rem;transform:translateZ(30px)}
+.proj-card p{color:var(--ink-soft);font-size:.93rem;flex:1;transform:translateZ(18px)}
+.proj-card .go{font-weight:700;font-size:.9rem;color:var(--accent)}
+.proj-card .go::after{content:" →";transition:margin .25s}
+.proj-card:hover .go::after{margin-left:6px}
+
+/* ==================== KEAHLIAN ==================== */
+.skills{max-width:640px}
+.skill{margin-bottom:26px}
+.skill-top{display:flex;justify-content:space-between;font-weight:600;margin-bottom:8px}
+.skill-top .pct{color:var(--accent);font-variant-numeric:tabular-nums}
+.bar{height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));
+  transition:width 1.4s var(--ease)}
+.note{font-size:.85rem;color:var(--ink-soft);font-style:italic;margin-top:22px}
+
+/* ==================== KONTAK ==================== */
+.contact{text-align:center}
+.contact h2{font-family:var(--font-head);font-size:clamp(2rem,5vw,3.4rem);font-weight:700;margin:14px 0 18px}
+.contact p{color:var(--ink-soft);max-width:52ch;margin:0 auto 30px}
+.gh-big{display:inline-flex;align-items:center;gap:14px;text-decoration:none;
+  font:700 1.15rem var(--font-head);color:#fff;padding:20px 42px;border-radius:99px;
+  background:linear-gradient(120deg,var(--accent),var(--accent2));box-shadow:var(--shadow)}
+[data-theme="minimal"] .gh-big{background:var(--ink)}
+.gh-big svg{width:28px;height:28px;fill:#fff}
+
+/* ==================== FOOTER ==================== */
+footer{border-top:1px solid var(--line);padding:34px 0;text-align:center;color:var(--ink-soft);font-size:.9rem}
+footer b{color:var(--ink)}
+
+/* ==================== BACK TO TOP ==================== */
+#toTop{position:fixed;right:22px;bottom:22px;z-index:900;width:52px;height:52px;border-radius:50%;
+  border:1px solid var(--line);background:var(--card);color:var(--accent);font-size:1.4rem;cursor:pointer;
+  box-shadow:var(--shadow);opacity:0;visibility:hidden;transform:translateY(14px);transition:all .4s var(--ease)}
+#toTop.show{opacity:1;visibility:visible;transform:none}
+#toTop:hover{background:var(--accent);color:#fff}
+
+/* ==================== REDUCED MOTION ==================== */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body data-theme="ceria">
+
+<!-- Preloader -->
+<div id="preloader" aria-hidden="true">
+  <div class="loader-name">Rahmy Fauzanibudi Ahmad</div>
+  <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
+  <div class="loader-pct" id="loaderPct">0%</div>
+</div>
+
+<!-- Custom cursor + background layers -->
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<div class="blobs" aria-hidden="true">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+</div>
+
+<!-- Navbar -->
+<nav aria-label="Navigasi utama">
+  <div class="nav-inner">
+    <a class="brand" href="#hero">Rahmy<span>.</span>Fauzanibudi</a>
+    <ul class="nav-links">
+      <li><a href="#tentang" data-nav>Tentang</a></li>
+      <li><a href="#proyek" data-nav>Proyek</a></li>
+      <li><a href="#keahlian" data-nav>Keahlian</a></li>
+      <li><a href="#kontak" data-nav>Kontak</a></li>
+    </ul>
+    <div class="theme-switch" role="group" aria-label="Pilih tema">
+      <button data-set-theme="ceria" class="active">Ceria</button>
+      <button data-set-theme="neon">Neon</button>
+      <button data-set-theme="minimal">Minimal</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="hero">
+  <div class="hero-inner">
+    <p class="eyebrow reveal">Halo, selamat datang di halamanku</p>
+    <h1><span id="typewriter" class="glitch" data-text=""></span><span class="caret">|</span></h1>
+    <p class="roles reveal d1">Saya seorang <span class="role-word" id="roleWord">Developer</span></p>
+    <p class="hero-desc reveal d2">Halaman personal satu berkas — penuh animasi, tiga tema visual yang bisa diganti kapan saja, dan datanya diambil dari profil GitHub-ku.</p>
+    <div class="cta-row reveal d3">
+      <a class="btn btn-primary magnetic" href="#proyek">Lihat Proyek</a>
+      <a class="btn btn-ghost magnetic" href="https://github.com/rahmyfauzan" target="_blank" rel="noopener">GitHub Saya</a>
+    </div>
+  </div>
+  <div class="scroll-hint">gulir</div>
+</header>
+
+<!-- Marquee ticker -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track" id="marqueeTrack">
+    <span><i>✦</i>Developer</span><span><i>✦</i>Kreator</span><span><i>✦</i>Pembelajar</span>
+    <span><i>✦</i>Open Source</span><span><i>✦</i>Web</span><span><i>✦</i>Animasi</span>
+  </div>
+</div>
+
+<main>
+<!-- TENTANG -->
+<section id="tentang">
+  <div class="container">
+    <div class="sec-head reveal">
+      <p class="sec-tag">Tentang</p>
+      <h2 class="sec-title">Sedikit tentang saya</h2>
+    </div>
+    <div class="about-grid">
+      <div class="reveal d1">
+        <p>Halo! Saya <strong>Rahmy Fauzanibudi Ahmad</strong>, aktif di GitHub dengan nama pengguna <strong>rahmyfauzan</strong> sejak <strong>Maret 2023</strong>.</p>
+        <p>Saya membangun dan bereksperimen dengan proyek perangkat lunak — dari skrip kecil sampai aplikasi web. Bahasa yang paling sering muncul di repositori saya adalah <strong>TypeScript</strong> dan <strong>JavaScript</strong>.</p>
+        <p>Halaman ini dibuat sebagai satu berkas HTML mandiri: tanpa framework, tanpa build step, dan penuh animasi yang bisa kamu jelajahi lewat tombol tema di atas.</p>
+      </div>
+      <div class="reveal d2">
+        <div class="stats">
+          <div class="stat"><b><span class="counter" data-target="4">0</span></b><small>Repositori publik</small></div>
+          <div class="stat"><b><span class="counter" data-target="2023">0</span></b><small>Bergabung GitHub</small></div>
+          <div class="stat"><b><span class="counter" data-target="2">0</span></b><small>Bahasa terdeteksi</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROYEK -->
+<section id="proyek">
+  <div class="container">
+    <div class="sec-head reveal">
+      <p class="sec-tag">Proyek</p>
+      <h2 class="sec-title">Repositori GitHub saya</h2>
+    </div>
+    <div class="proj-grid">
+      <a class="proj-card tilt reveal" href="https://github.com/rahmyfauzan/task" target="_blank" rel="noopener">
+        <span class="lang">GitHub</span><h3>task</h3>
+        <p>Repositori eksperimen dan catatan kerja. Deskripsi menyusul.</p>
+        <span class="go">Buka repo</span>
+      </a>
+      <a class="proj-card tilt reveal d1" href="https://github.com/rahmyfauzan/pt-akn" target="_blank" rel="noopener">
+        <span class="lang">TypeScript</span><h3>pt-akn</h3>
+        <p>Proyek berbasis TypeScript — lihat kode dan riwayat commit di GitHub.</p>
+        <span class="go">Buka repo</span>
+      </a>
+      <a class="proj-card tilt reveal d2" href="https://github.com/rahmyfauzan/profile" target="_blank" rel="noopener">
+        <span class="lang">JavaScript</span><h3>profile</h3>
+        <p>Profile and CV — halaman profil dan CV dalam JavaScript.</p>
+        <span class="go">Buka repo</span>
+      </a>
+      <a class="proj-card tilt reveal d3" href="https://github.com/rahmyfauzan/muse" target="_blank" rel="noopener">
+        <span class="lang">HTML</span><h3>muse</h3>
+        <p>Rumah bagi situs ini — halaman personal satu berkas yang sedang kamu baca.</p>
+        <span class="go">Buka repo</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- KEAHLIAN -->
+<section id="keahlian">
+  <div class="container">
+    <div class="sec-head reveal">
+      <p class="sec-tag">Keahlian</p>
+      <h2 class="sec-title">Ter­deteksi dari GitHub</h2>
+    </div>
+    <div class="skills reveal d1">
+      <div class="skill">
+        <div class="skill-top"><span>TypeScript</span><span class="pct" data-pct="80">0%</span></div>
+        <div class="bar"><i data-w="80"></i></div>
+      </div>
+      <div class="skill">
+        <div class="skill-top"><span>JavaScript</span><span class="pct" data-pct="75">0%</span></div>
+        <div class="bar"><i data-w="75"></i></div>
+      </div>
+      <div class="skill">
+        <div class="skill-top"><span>HTML / CSS</span><span class="pct" data-pct="85">0%</span></div>
+        <div class="bar"><i data-w="85"></i></div>
+      </div>
+      <p class="note">TypeScript &amp; JavaScript terdeteksi dari bahasa repositori GitHub; HTML/CSS adalah keahlian web umum. Angka persentase bersifat ilustratif.</p>
+    </div>
+  </div>
+</section>
+
+<!-- KONTAK -->
+<section id="kontak" class="contact">
+  <div class="container">
+    <div class="reveal">
+      <p class="sec-tag">Kontak</p>
+      <h2>Mari terhubung</h2>
+      <p>Tempat terbaik untuk melihat apa yang sedang saya kerjakan adalah profil GitHub saya. Data kontak lain bisa ditambahkan nanti.</p>
+      <a class="gh-big magnetic" href="https://github.com/rahmyfauzan" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        @rahmyfauzan
+      </a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <p><b>Rahmy Fauzanibudi Ahmad</b> · <span id="year">2026</span> · Dibuat dengan satu berkas HTML</p>
+  </div>
+</footer>
+
+<button id="toTop" aria-label="Kembali ke atas">↑</button>
+<script>
+/* ============================================================
+   Semua logika vanilla JS. Menghormati prefers-reduced-motion.
+============================================================ */
+(function(){
+"use strict";
+const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const finePointer = window.matchMedia("(hover:hover) and (pointer:fine)").matches;
+
+/* ---------- 1. PRELOADER ---------- */
+const pre = document.getElementById("preloader"),
+      fill = document.getElementById("loaderFill"),
+      pct = document.getElementById("loaderPct");
+let p = 0;
+const tick = setInterval(()=>{
+  p = Math.min(100, p + Math.random()*16 + 4);
+  fill.style.width = p + "%";
+  pct.textContent = Math.floor(p) + "%";
+  if(p >= 100){
+    clearInterval(tick);
+    setTimeout(()=>{ pre.classList.add("done"); startTypewriter(); }, 350);
+  }
+}, reduced ? 30 : 140);
+
+/* ---------- 2. CUSTOM CURSOR (non-touch) ---------- */
+if(finePointer && !reduced){
+  const dot = document.getElementById("cursorDot"),
+        glow = document.getElementById("cursorGlow");
+  let mx=innerWidth/2,my=innerHeight/2,gx=mx,gy=my;
+  addEventListener("mousemove",e=>{
+    mx=e.clientX; my=e.clientY;
+    dot.style.left=mx+"px"; dot.style.top=my+"px";
+  });
+  (function loop(){
+    gx += (mx-gx)*0.16; gy += (my-gy)*0.16; // glow mengekor
+    glow.style.left=gx+"px"; glow.style.top=gy+"px";
+    requestAnimationFrame(loop);
+  })();
+  document.querySelectorAll("a,button,.proj-card").forEach(el=>{
+    el.addEventListener("mouseenter",()=>document.body.classList.add("cursor-hover"));
+    el.addEventListener("mouseleave",()=>document.body.classList.remove("cursor-hover"));
+  });
+}
+
+/* ---------- 3. THEME SWITCHER + NEON CANVAS ---------- */
+const canvas = document.getElementById("bg-canvas"),
+      ctx = canvas.getContext("2d");
+let parts = [], raf = null;
+function sizeCanvas(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+function spawn(){
+  parts = Array.from({length: Math.min(110, innerWidth/12)}, ()=>({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+    vx:(Math.random()-.5)*.6, vy:(Math.random()-.5)*.6,
+    r:Math.random()*2.2+.6,
+    c:["0,240,255","255,47,214","163,255,18"][Math.floor(Math.random()*3)]
+  }));
+}
+function drawNeon(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // grid samar
+  ctx.strokeStyle="rgba(0,240,255,.06)"; ctx.lineWidth=1;
+  const g=56;
+  ctx.beginPath();
+  for(let x=0;x<canvas.width;x+=g){ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);}
+  for(let y=0;y<canvas.height;y+=g){ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);}
+  ctx.stroke();
+  // garis koneksi + partikel
+  for(let i=0;i<parts.length;i++){
+    const a=parts[i];
+    a.x+=a.vx; a.y+=a.vy;
+    if(a.x<0||a.x>canvas.width)a.vx*=-1;
+    if(a.y<0||a.y>canvas.height)a.vy*=-1;
+    for(let j=i+1;j<parts.length;j++){
+      const b=parts[j],dx=a.x-b.x,dy=a.y-b.y,d=dx*dx+dy*dy;
+      if(d<13000){
+        ctx.strokeStyle=`rgba(${a.c},${(1-d/13000)*.35})`;
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+      }
+    }
+    ctx.fillStyle=`rgba(${a.c},.9)`;
+    ctx.shadowColor=`rgba(${a.c},1)`; ctx.shadowBlur=12;
+    ctx.beginPath();ctx.arc(a.x,a.y,a.r,0,7);ctx.fill();
+    ctx.shadowBlur=0;
+  }
+  raf=requestAnimationFrame(drawNeon);
+}
+function setTheme(name){
+  document.body.dataset.theme = name;
+  document.querySelectorAll("[data-set-theme]").forEach(b=>
+    b.classList.toggle("active", b.dataset.setTheme===name));
+  try{ localStorage.setItem("rfa-theme", name); }catch(e){}
+  if(name==="neon" && !reduced){
+    sizeCanvas(); spawn();
+    cancelAnimationFrame(raf); drawNeon();
+  } else cancelAnimationFrame(raf);
+}
+document.querySelectorAll("[data-set-theme]").forEach(b=>
+  b.addEventListener("click",()=>setTheme(b.dataset.setTheme)));
+addEventListener("resize",()=>{ if(document.body.dataset.theme==="neon") sizeCanvas(); });
+try{ const s=localStorage.getItem("rfa-theme"); if(s) setTheme(s); }catch(e){}
+
+/* ---------- 4. TYPEWRITER ---------- */
+const NAME = "Rahmy Fauzanibudi Ahmad";
+const tw = document.getElementById("typewriter");
+let started=false;
+function startTypewriter(){
+  if(started) return; started=true;
+  tw.dataset.text = NAME;
+  if(reduced){ tw.textContent = NAME; return; }
+  let i=0;
+  (function type(){
+    tw.textContent = NAME.slice(0,++i);
+    tw.dataset.text = tw.textContent;
+    if(i<NAME.length) setTimeout(type, 75+Math.random()*60);
+  })();
+}
+
+/* ---------- 5. ROTATING ROLES ---------- */
+const roles=["Developer","Kreator","Pembelajar"];
+const roleEl=document.getElementById("roleWord");
+let ri=0;
+if(!reduced) setInterval(()=>{
+  roleEl.classList.add("swap");
+  setTimeout(()=>{
+    ri=(ri+1)%roles.length;
+    roleEl.textContent=roles[ri];
+    roleEl.classList.remove("swap");
+  },350);
+},2600);
+
+/* ---------- 6. SCROLL REVEALS + COUNTERS + SKILL BARS ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting) return;
+  e.target.classList.add("in");
+  // counter animasi
+  e.target.querySelectorAll(".counter").forEach(runCounter);
+  if(e.target.classList.contains("counter")) runCounter(e.target);
+  // skill bars
+  e.target.querySelectorAll(".bar i").forEach(bar=>{
+    bar.style.width=bar.dataset.w+"%";
+  });
+  e.target.querySelectorAll(".pct").forEach(runPct);
+  io.unobserve(e.target);
+}),{threshold:.18});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+function runCounter(el){
+  if(el.dataset.done) return; el.dataset.done=1;
+  const target=+el.dataset.target;
+  if(reduced){ el.textContent=target; return; }
+  const t0=performance.now(), dur=1400;
+  (function step(t){
+    const k=Math.min(1,(t-t0)/dur), ease=1-Math.pow(1-k,3);
+    el.textContent=Math.round(target*ease);
+    if(k<1) requestAnimationFrame(step);
+  })(t0);
+}
+function runPct(el){
+  if(el.dataset.done) return; el.dataset.done=1;
+  const target=+el.dataset.pct;
+  if(reduced){ el.textContent=target+"%"; return; }
+  const t0=performance.now(), dur=1400;
+  (function step(t){
+    const k=Math.min(1,(t-t0)/dur);
+    el.textContent=Math.round(target*k)+"%";
+    if(k<1) requestAnimationFrame(step);
+  })(t0);
+}
+
+/* ---------- 7. MAGNETIC BUTTONS ---------- */
+if(finePointer && !reduced){
+  document.querySelectorAll(".magnetic").forEach(btn=>{
+    btn.addEventListener("mousemove",e=>{
+      const r=btn.getBoundingClientRect();
+      const x=e.clientX-r.left-r.width/2, y=e.clientY-r.top-r.height/2;
+      btn.style.transform=`translate(${x*.18}px,${y*.28}px)`;
+    });
+    btn.addEventListener("mouseleave",()=>{ btn.style.transform=""; });
+  });
+}
+
+/* ---------- 8. 3D TILT CARDS ---------- */
+if(finePointer && !reduced){
+  document.querySelectorAll(".tilt").forEach(card=>{
+    card.addEventListener("mousemove",e=>{
+      const r=card.getBoundingClientRect();
+      const rx=((e.clientY-r.top)/r.height-.5)*-14;
+      const ry=((e.clientX-r.left)/r.width-.5)*14;
+      card.style.transform=`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+    });
+    card.addEventListener("mouseleave",()=>{ card.style.transform=""; });
+  });
+}
+
+/* ---------- 9. BACK TO TOP + ACTIVE NAV ---------- */
+const toTop=document.getElementById("toTop");
+const navLinks=[...document.querySelectorAll("[data-nav]")];
+const sections=navLinks.map(a=>document.querySelector(a.getAttribute("href")));
+addEventListener("scroll",()=>{
+  toTop.classList.toggle("show", scrollY>600);
+  let cur="";
+  sections.forEach(s=>{ if(s && scrollY>=s.offsetTop-140) cur="#"+s.id; });
+  navLinks.forEach(a=>a.classList.toggle("active", a.getAttribute("href")===cur));
+},{passive:true});
+toTop.addEventListener("click",()=>scrollTo({top:0,behavior:reduced?"auto":"smooth"}));
+
+/* ---------- 10. MARQUEE: gandakan isi agar loop mulus ---------- */
+const mt=document.getElementById("marqueeTrack");
+mt.innerHTML += mt.innerHTML;
+
+/* ---------- 11. Tahun footer ---------- */
+document.getElementById("year").textContent=new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
