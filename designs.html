@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<!-- ============================================================
+  designs.html — Galeri 10 Desain
+  Satu halaman, 10 tema lengkap yang bisa di-switch. Konten demo
+  yang sama di-skin ulang oleh setiap tema: referensi visual.
+
+  Single-file, vanilla JS, tanpa build step. Buka dari file:// OK.
+  Tema diganti lewat [data-theme] pada <html> + CSS variables.
+============================================================ -->
+<html lang="id" data-theme="ceria">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galeri 10 Desain — Referensi Tema</title>
+<meta name="description" content="Galeri referensi 10 gaya desain web yang bisa diganti dalam satu halaman.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================= BASE ================= */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* default = Ceria; dioverride per [data-theme] */
+  --bg:#fdf6ff; --bg-soft:#ffffff; --ink:#1d1030; --ink-soft:#5b4a7a;
+  --accent:#ff4d8d; --accent2:#7c3aed; --accent3:#22d3ee;
+  --card:#ffffff; --line:rgba(29,16,48,.12);
+  --shadow:0 18px 50px -18px rgba(124,58,237,.35);
+  --font-head:'Space Grotesk',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'Space Mono',monospace;
+  --radius:22px; --btn-radius:99px;
+  --ease:cubic-bezier(.34,1.56,.64,1);
+  --head-transform:none; --head-style:normal; --head-weight:700;
+  --card-border:1px solid var(--line);
+  --btn-primary-bg:linear-gradient(120deg,var(--accent),var(--accent2));
+  --btn-primary-color:#fff;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--ink);line-height:1.7;overflow-x:hidden;transition:background .5s ease,color .5s ease;min-height:100vh}
+::selection{background:var(--accent);color:#fff}
+.container{width:min(1080px,92%);margin:0 auto}
+section.demo{padding:64px 0;border-top:1px solid var(--line)}
+.sec-tag{font-size:.78rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.sec-title{font-family:var(--font-head);font-weight:var(--head-weight);font-style:var(--head-style);text-transform:var(--head-transform);font-size:clamp(1.6rem,4vw,2.4rem);margin-bottom:8px;transition:all .4s var(--ease)}
+.sec-desc{color:var(--ink-soft);max-width:60ch;margin-bottom:28px}
+
+/* ---------- NEON ---------- */
+[data-theme="neon"]{
+  --bg:#050510; --bg-soft:#0a0a1c; --ink:#e8f6ff; --ink-soft:#8ea3c9;
+  --accent:#00f0ff; --accent2:#ff2fd6; --accent3:#a3ff12;
+  --card:rgba(14,14,32,.82); --line:rgba(0,240,255,.16);
+  --shadow:0 0 34px -6px rgba(0,240,255,.35);
+  --font-head:'Space Grotesk',sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --btn-primary-bg:linear-gradient(120deg,var(--accent),var(--accent2));
+}
+/* ---------- MINIMAL ---------- */
+[data-theme="minimal"]{
+  --bg:#faf9f6; --bg-soft:#ffffff; --ink:#141414; --ink-soft:#6f6a63;
+  --accent:#141414; --accent2:#8a7a5c; --accent3:#c9c2b4;
+  --card:#ffffff; --line:rgba(20,20,20,.14);
+  --shadow:0 24px 60px -30px rgba(20,20,20,.25);
+  --font-head:'Playfair Display',serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --head-style:italic; --head-weight:900;
+  --btn-primary-bg:var(--ink);
+}
+/* ---------- BRUTALIST ---------- */
+[data-theme="brutalist"]{
+  --bg:#ffffff; --bg-soft:#ffffff; --ink:#000000; --ink-soft:#333333;
+  --accent:#ff3d00; --accent2:#000000; --accent3:#ff3d00;
+  --card:#ffffff; --line:#000000;
+  --shadow:6px 6px 0 #000000;
+  --font-head:'Space Grotesk',sans-serif; --font-mono:'Space Mono',monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --radius:0px; --btn-radius:0px;
+  --head-transform:uppercase; --head-weight:700;
+  --card-border:3px solid #000;
+  --btn-primary-bg:var(--accent); --btn-primary-color:#000;
+}
+/* ---------- GLASSMORPHISM ---------- */
+[data-theme="glass"]{
+  --bg:linear-gradient(135deg,#dbeafe 0%,#e9d5ff 45%,#fce7f3 100%);
+  --bg-soft:rgba(255,255,255,.4); --ink:#1e1b4b; --ink-soft:#4c4a7d;
+  --accent:#7c3aed; --accent2:#2563eb; --accent3:#db2777;
+  --card:rgba(255,255,255,.25); --line:rgba(255,255,255,.6);
+  --shadow:0 8px 32px rgba(124,58,237,.18), inset 0 1px 0 rgba(255,255,255,.6);
+  --font-head:'Outfit',sans-serif; --font-body:'Inter',sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --card-border:1px solid rgba(255,255,255,.6);
+  --btn-primary-bg:linear-gradient(120deg,var(--accent),var(--accent2));
+}
+[data-theme="glass"] body{background:var(--bg);background-attachment:fixed}
+[data-theme="glass"] .card,[data-theme="glass"] .swatch,[data-theme="glass"] .sig-panel{
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+/* ---------- VAPORWAVE ---------- */
+[data-theme="vaporwave"]{
+  --bg:#1a0b2e; --bg-soft:#241040; --ink:#fdf4ff; --ink-soft:#c9a8e0;
+  --accent:#ff71ce; --accent2:#01cdfe; --accent3:#fffb96;
+  --card:rgba(36,16,64,.85); --line:rgba(255,113,206,.25);
+  --shadow:0 0 30px -4px rgba(255,113,206,.4);
+  --font-head:'Orbitron',sans-serif; --font-mono:'VT323',monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --head-weight:900;
+  --card-border:1px solid var(--line);
+  --btn-primary-bg:linear-gradient(120deg,var(--accent),var(--accent2));
+}
+/* ---------- ORGANIC ---------- */
+[data-theme="organic"]{
+  --bg:#f7f4ec; --bg-soft:#ffffff; --ink:#2d3a2e; --ink-soft:#5f6f60;
+  --accent:#4a7c59; --accent2:#8fbf6b; --accent3:#d9e8c9;
+  --card:#ffffff; --line:rgba(45,58,46,.14);
+  --shadow:0 20px 45px -20px rgba(74,124,89,.35);
+  --font-head:'Fraunces',serif;
+  --ease:cubic-bezier(.34,1.3,.64,1);
+  --radius:28px; --btn-radius:99px;
+  --head-weight:600;
+  --btn-primary-bg:var(--accent);
+}
+/* ---------- EDITORIAL ---------- */
+[data-theme="editorial"]{
+  --bg:#fbfbf8; --bg-soft:#ffffff; --ink:#111111; --ink-soft:#555555;
+  --accent:#c1121f; --accent2:#111111; --accent3:#8a8a8a;
+  --card:#ffffff; --line:rgba(17,17,17,.2);
+  --shadow:0 10px 30px -18px rgba(17,17,17,.3);
+  --font-head:'Libre Baskerville',serif; --font-body:'Libre Baskerville',serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --radius:2px; --btn-radius:2px;
+  --head-weight:700;
+  --btn-primary-bg:var(--ink);
+}
+/* ---------- CORPORATE ---------- */
+[data-theme="corporate"]{
+  --bg:#ffffff; --bg-soft:#f6f9fc; --ink:#0f1b2d; --ink-soft:#5b6b82;
+  --accent:#2563eb; --accent2:#0ea5e9; --accent3:#10b981;
+  --card:#ffffff; --line:rgba(15,27,45,.1);
+  --shadow:0 12px 32px -16px rgba(37,99,235,.25);
+  --font-head:'Plus Jakarta Sans',sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --radius:12px; --btn-radius:10px;
+  --head-weight:800;
+  --btn-primary-bg:var(--accent);
+}
+/* ---------- PASTEL DREAM ---------- */
+[data-theme="pastel"]{
+  --bg:#fff7fb; --bg-soft:#ffffff; --ink:#5b3a4e; --ink-soft:#a07e93;
+  --accent:#ff8fc7; --accent2:#7cc4ff; --accent3:#ffd98a;
+  --card:#ffffff; --line:rgba(255,143,199,.3);
+  --shadow:0 14px 34px -16px rgba(255,143,199,.45);
+  --font-head:'Quicksand',sans-serif;
+  --ease:cubic-bezier(.34,1.56,.64,1);
+  --radius:28px; --btn-radius:99px;
+  --head-weight:700;
+  --btn-primary-bg:linear-gradient(120deg,var(--accent),var(--accent2));
+  --btn-primary-color:#5b3a4e;
+}
+
+/* ================= BACKGROUND DECO ================= */
+#bg-canvas{position:fixed;inset:0;z-index:0;display:none;pointer-events:none}
+[data-theme="neon"] #bg-canvas{display:block}
+.blobs{position:fixed;inset:0;z-index:0;overflow:hidden;display:none;pointer-events:none}
+[data-theme="ceria"] .blobs{display:block}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:drift 18s ease-in-out infinite alternate}
+.blob.b1{width:44vw;height:44vw;left:-8vw;top:-10vh;background:var(--accent)}
+.blob.b2{width:36vw;height:36vw;right:-6vw;top:24vh;background:var(--accent2);animation-delay:-6s}
+.blob.b3{width:30vw;height:30vw;left:30vw;bottom:-12vh;background:var(--accent3);animation-delay:-12s}
+@keyframes drift{to{transform:translate(6vw,5vh) scale(1.15) rotate(20deg)}}
+/* vaporwave: lantai grid perspektif */
+.gridfloor{position:fixed;left:-25%;right:-25%;bottom:-12%;height:46%;z-index:0;display:none;pointer-events:none;
+  background-image:linear-gradient(var(--accent2) 2px,transparent 2px),linear-gradient(90deg,var(--accent2) 2px,transparent 2px);
+  background-size:56px 56px;transform:perspective(420px) rotateX(62deg);opacity:.4;
+  -webkit-mask-image:linear-gradient(to top,#000 30%,transparent 95%);mask-image:linear-gradient(to top,#000 30%,transparent 95%);
+  animation:gridmove 3.2s linear infinite}
+@keyframes gridmove{to{background-position-y:56px}}
+[data-theme="vaporwave"] .gridfloor{display:block}
+/* organic: daun */
+.leaves{position:fixed;inset:0;z-index:0;display:none;pointer-events:none;overflow:hidden}
+[data-theme="organic"] .leaves{display:block}
+.leaf{position:absolute;width:120px;height:120px;background:radial-gradient(ellipse at 30% 30%,var(--accent2),var(--accent));border-radius:0 60% 0 60%;opacity:.18;animation:sway 9s ease-in-out infinite alternate}
+.leaf.l1{left:6%;top:12%}.leaf.l2{right:8%;top:30%;animation-delay:-3s;transform:scale(1.4) rotate(40deg)}
+.leaf.l3{left:20%;bottom:8%;animation-delay:-6s;transform:scale(.8) rotate(-30deg)}
+@keyframes sway{to{transform:translateY(-26px) rotate(14deg)}}
+/* pastel: pola titik */
+[data-theme="pastel"] body{background-image:radial-gradient(rgba(255,143,199,.22) 2.2px,transparent 2.2px);background-size:30px 30px}
+main,header.top{position:relative;z-index:1}
+
+/* ================= HEADER & INTRO ================= */
+header.top{padding:56px 0 8px;text-align:center}
+header.top .kicker{font-size:.78rem;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);font-weight:700}
+header.top h1{font-family:var(--font-head);font-weight:var(--head-weight);font-style:var(--head-style);text-transform:var(--head-transform);font-size:clamp(2rem,6vw,3.4rem);margin:12px 0 6px}
+header.top p{color:var(--ink-soft);max-width:56ch;margin:0 auto}
+#intro{margin:34px auto 0;max-width:720px;text-align:center;padding:26px 30px;background:var(--card);border:var(--card-border);border-radius:var(--radius);box-shadow:var(--shadow);transition:all .4s var(--ease)}
+#intro .num{font-family:var(--font-mono);font-size:.8rem;color:var(--accent);letter-spacing:.2em}
+#intro h2{font-family:var(--font-head);font-weight:var(--head-weight);font-style:var(--head-style);text-transform:var(--head-transform);font-size:clamp(1.5rem,4vw,2.2rem);margin:6px 0}
+#intro .persona{font-size:1.02rem;margin-bottom:6px}
+#intro .fit{color:var(--ink-soft);font-size:.92rem}
+#intro .fit b{color:var(--accent)}
+
+/* ================= HERO DEMO ================= */
+.hero-demo{padding:80px 0;text-align:center;position:relative}
+.hero-demo .tag{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);border:1px solid var(--line);padding:8px 18px;border-radius:var(--btn-radius);margin-bottom:20px;background:var(--bg-soft)}
+.hero-demo h2{font-family:var(--font-head);font-weight:var(--head-weight);font-style:var(--head-style);text-transform:var(--head-transform);font-size:clamp(2.4rem,7vw,4.4rem);line-height:1.12;margin-bottom:18px;transition:all .4s var(--ease)}
+[data-theme="neon"] .hero-demo h2{text-shadow:0 0 26px var(--accent)}
+[data-theme="vaporwave"] .hero-demo h2{background:linear-gradient(180deg,#fff 20%,var(--accent) 45%,var(--accent2) 75%,#fffb96);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:.04em}
+[data-theme="brutalist"] .hero-demo h2{background:var(--accent);color:#fff;display:inline-block;padding:6px 18px;box-shadow:var(--shadow)}
+[data-theme="editorial"] .hero-demo h2{font-size:clamp(2rem,5.5vw,3.4rem)}
+.hero-demo p{color:var(--ink-soft);max-width:58ch;margin:0 auto 30px}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ================= BUTTONS ================= */
+.btn{display:inline-block;font:600 .95rem var(--font-body);padding:14px 28px;border-radius:var(--btn-radius);cursor:pointer;text-decoration:none;border:2px solid transparent;transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s;letter-spacing:.02em}
+.btn-primary{background:var(--btn-primary-bg);color:var(--btn-primary-color);box-shadow:var(--shadow)}
+.btn-primary:hover{transform:translateY(-3px) scale(1.03)}
+.btn-ghost{background:var(--bg-soft);color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{transform:translateY(-3px);border-color:var(--accent)}
+.btn-small{padding:9px 18px;font-size:.82rem}
+[data-theme="brutalist"] .btn{border:3px solid #000;text-transform:uppercase;font-family:var(--font-mono)}
+[data-theme="brutalist"] .btn-primary:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 #000}
+[data-theme="editorial"] .btn{border-radius:2px;letter-spacing:.08em;text-transform:uppercase;font-size:.82rem}
+[data-theme="vaporwave"] .btn{font-family:var(--font-head);letter-spacing:.1em}
+
+/* ================= SWATCHES ================= */
+.swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px}
+.swatch{background:var(--card);border:var(--card-border);border-radius:var(--radius);overflow:hidden;cursor:pointer;box-shadow:var(--shadow);transition:transform .3s var(--ease)}
+.swatch:hover{transform:translateY(-4px) scale(1.02)}
+.swatch .chip{height:86px}
+.swatch .meta{padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.swatch .name{font-size:.82rem;font-weight:600}
+.swatch .hex{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-soft)}
+.swatch .copied{position:absolute;font-size:.72rem;font-weight:700;color:var(--accent);opacity:0;transition:opacity .3s}
+.swatch{position:relative}
+.swatch.flash .copied{opacity:1}
+
+/* ================= TYPE DEMO ================= */
+.type-row{display:grid;gap:22px}
+.type-sample{background:var(--card);border:var(--card-border);border-radius:var(--radius);padding:26px 28px;box-shadow:var(--shadow)}
+.type-sample .label{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.type-h{font-family:var(--font-head);font-weight:var(--head-weight);font-style:var(--head-style);text-transform:var(--head-transform);font-size:clamp(1.5rem,4vw,2.2rem)}
+.type-b{font-family:var(--font-body);font-size:1rem;color:var(--ink-soft);max-width:62ch}
+.type-c{font-family:var(--font-body);font-size:.8rem;color:var(--ink-soft);letter-spacing:.04em}
+
+/* ================= CARDS ================= */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
+.card{background:var(--card);border:var(--card-border);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);transition:transform .3s var(--ease),box-shadow .3s}
+.card:hover{transform:translateY(-6px)}
+.card .k{font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.card h3{font-family:var(--font-head);font-weight:var(--head-weight);font-style:var(--head-style);text-transform:var(--head-transform);font-size:1.25rem;margin-bottom:8px}
+.card p{color:var(--ink-soft);font-size:.92rem;margin-bottom:16px}
+.card a{color:var(--accent);font-weight:700;text-decoration:none;font-size:.9rem}
+[data-theme="brutalist"] .card:hover{transform:translate(-3px,-3px);box-shadow:10px 10px 0 #000}
+
+/* ================= SIGNATURE COMPONENT ================= */
+.sig-panel{background:var(--card);border:var(--card-border);border-radius:var(--radius);box-shadow:var(--shadow);padding:34px;overflow:hidden;transition:all .4s var(--ease)}
+[data-sig]{display:none}
+[data-theme="ceria"] [data-sig="ceria"],[data-theme="neon"] [data-sig="neon"],
+[data-theme="minimal"] [data-sig="minimal"],[data-theme="brutalist"] [data-sig="brutalist"],
+[data-theme="glass"] [data-sig="glass"],[data-theme="vaporwave"] [data-sig="vaporwave"],
+[data-theme="organic"] [data-sig="organic"],[data-theme="editorial"] [data-sig="editorial"],
+[data-theme="corporate"] [data-sig="corporate"],[data-theme="pastel"] [data-sig="pastel"]{display:block}
+/* brutalist marquee */
+.marquee{overflow:hidden;white-space:nowrap;background:var(--accent);border:3px solid #000;padding:12px 0}
+.marquee-track{display:inline-flex;gap:40px;animation:scrollX 16s linear infinite;padding-right:40px}
+.marquee span{font-family:var(--font-mono);font-weight:700;text-transform:uppercase;color:#fff;font-size:1.1rem}
+@keyframes scrollX{to{transform:translateX(-50%)}}
+/* vaporwave sun */
+.suns{position:relative;height:220px;overflow:hidden;border-radius:var(--radius);background:linear-gradient(180deg,#2b0f4d,#ff71ce33)}
+.sun{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);width:170px;height:170px;border-radius:50%;
+  background:linear-gradient(180deg,var(--accent3) 0%,var(--accent) 60%,var(--accent2) 100%);
+  -webkit-mask-image:repeating-linear-gradient(180deg,#000 0 12px,transparent 12px 17px);mask-image:repeating-linear-gradient(180deg,#000 0 12px,transparent 12px 17px)}
+/* editorial article */
+.article{columns:2;column-gap:34px;column-rule:1px solid var(--line);text-align:justify;font-size:.95rem;color:var(--ink-soft)}
+.article::first-letter{font-family:var(--font-head);font-size:3.4em;float:left;line-height:.9;padding-right:8px;color:var(--accent);font-weight:700}
+.dateline{font-family:var(--font-mono);font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);border-top:2px solid var(--ink);border-bottom:1px solid var(--line);padding:8px 0;margin-bottom:16px;display:flex;justify-content:space-between}
+/* corporate badges */
+.badges{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.badge{display:flex;align-items:center;gap:10px;background:var(--bg-soft);border:1px solid var(--line);border-radius:var(--radius);padding:12px 20px;font-weight:600;font-size:.9rem;box-shadow:var(--shadow)}
+.badge i{font-style:normal;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+/* glass panel demo */
+.glass-demo{border-radius:var(--radius);padding:30px;text-align:center}
+/* minimal quote */
+.big-quote{font-family:var(--font-head);font-style:italic;font-weight:900;font-size:clamp(1.4rem,3.6vw,2.1rem);line-height:1.5;text-align:center;max-width:34ch;margin:0 auto}
+.big-quote::before{content:"“";display:block;font-size:2.4em;color:var(--accent2);line-height:.6;margin-bottom:10px}
+/* neon terminal */
+.terminal{font-family:var(--font-mono);background:#000;border:1px solid var(--line);border-radius:12px;padding:20px 22px;font-size:.95rem;line-height:1.9;color:var(--accent3)}
+.terminal .p{color:var(--accent)}
+/* pastel sticker */
+.stickers{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.sticker{background:#fff;border:2px dashed var(--accent);border-radius:99px;padding:12px 26px;font-family:var(--font-head);font-weight:700;box-shadow:var(--shadow)}
+/* organic quote card */
+.organic-card{text-align:center}
+.organic-card .sprout{font-size:2.6rem;display:block;margin-bottom:12px}
+
+/* ================= FOOTER ================= */
+footer.site{border-top:1px solid var(--line);padding:40px 0 130px;text-align:center;color:var(--ink-soft);font-size:.88rem}
+
+/* ================= SWITCHER BAR ================= */
+#switcher{position:fixed;left:0;right:0;bottom:0;z-index:50;background:color-mix(in srgb,var(--bg-soft) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:10px 12px}
+#switcher .row{display:flex;align-items:center;gap:8px;max-width:1200px;margin:0 auto}
+.nav-arrow{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:1.1rem;cursor:pointer;transition:transform .25s var(--ease)}
+.nav-arrow:hover{transform:scale(1.1);border-color:var(--accent)}
+#theme-list{display:flex;gap:8px;overflow-x:auto;flex:1;padding:4px;scrollbar-width:thin}
+.theme-btn{flex:0 0 auto;display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:99px;padding:8px 14px;font:600 .8rem var(--font-body);cursor:pointer;transition:all .25s var(--ease);white-space:nowrap}
+.theme-btn .n{font-family:var(--font-mono);font-size:.72rem;background:var(--line);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+.theme-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(1.05)}
+.theme-btn.active .n{background:rgba(255,255,255,.25)}
+.theme-btn:hover:not(.active){border-color:var(--accent);color:var(--ink)}
+.hint{flex:0 0 auto;font-size:.72rem;color:var(--ink-soft);display:none}
+@media(min-width:900px){.hint{display:block}}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:640px){
+  .hero-demo{padding:56px 0}
+  #intro{padding:20px}
+  .article{columns:1}
+}
+/* reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
+  .reveal{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="blobs" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<div class="gridfloor" aria-hidden="true"></div>
+<div class="leaves" aria-hidden="true"><div class="leaf l1"></div><div class="leaf l2"></div><div class="leaf l3"></div></div>
+
+<main>
+<header class="top container">
+  <div class="kicker">Referensi Visual</div>
+  <h1>Galeri 10 Desain</h1>
+  <p>Sepuluh gaya desain lengkap dalam satu halaman. Ganti tema lewat bilah di bawah —
+  seluruh konten demo berubah mengikuti tema yang aktif.</p>
+</header>
+
+<div class="container">
+  <div id="intro" class="reveal">
+    <div class="num" id="intro-num">DESAIN 01 / 10</div>
+    <h2 id="intro-name">Ceria</h2>
+    <p class="persona" id="intro-persona"></p>
+    <p class="fit" id="intro-fit"></p>
+  </div>
+</div>
+
+<!-- HERO DEMO -->
+<section class="demo hero-demo container">
+  <span class="tag">Contoh Hero</span>
+  <h2>Judul Besar yang Memukau Pengunjung</h2>
+  <p>Ini adalah paragraf contoh untuk melihat bagaimana tipografi, spasi, dan warna
+  sebuah tema bekerja pada bagian paling penting dari sebuah halaman.</p>
+  <div class="hero-ctas">
+    <a class="btn btn-primary" href="#palet">Tombol Utama</a>
+    <a class="btn btn-ghost" href="#kartu">Tombol Kedua</a>
+  </div>
+</section>
+
+<!-- PALET -->
+<section class="demo container reveal" id="palet">
+  <div class="sec-tag">Referensi</div>
+  <h3 class="sec-title">Palet Warna</h3>
+  <p class="sec-desc">Klik swatch untuk menyalin kode HEX. <span style="font-family:var(--font-mono);font-size:.8em">(tips: klik!)</span></p>
+  <div class="swatches" id="swatches"></div>
+</section>
+
+<!-- TIPOGRAFI -->
+<section class="demo container reveal">
+  <div class="sec-tag">Referensi</div>
+  <h3 class="sec-title">Tipografi</h3>
+  <p class="sec-desc">Contoh heading, body, dan caption sesuai pasangan font tiap tema.</p>
+  <div class="type-row">
+    <div class="type-sample"><div class="label" id="font-head-label"></div><div class="type-h">Desain yang berbicara sebelum kata dibaca</div></div>
+    <div class="type-sample"><div class="label" id="font-body-label"></div><p class="type-b">Tubuh teks harus nyaman dibaca panjang: jarak baris lega, kontras cukup, dan ukuran yang tidak memaksa mata bekerja keras. Inilah contoh paragraf body.</p></div>
+    <div class="type-sample"><div class="label">Caption / Label kecil</div><p class="type-c">CAPTION KECIL UNTUK KETERANGAN, TAG, ATAU METADATA — RINGAN TAPI JELAS.</p></div>
+  </div>
+</section>
+
+<!-- TOMBOL -->
+<section class="demo container reveal">
+  <div class="sec-tag">Referensi</div>
+  <h3 class="sec-title">Tombol</h3>
+  <p class="sec-desc">Tiga varian tombol: utama, kedua (ghost), dan kecil.</p>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+    <a class="btn btn-primary" href="#tombol">Tombol Utama</a>
+    <a class="btn btn-ghost" href="#tombol">Tombol Kedua</a>
+    <a class="btn btn-primary btn-small" href="#tombol">Kecil</a>
+  </div>
+</section>
+
+<!-- KARTU -->
+<section class="demo container reveal" id="kartu">
+  <div class="sec-tag">Referensi</div>
+  <h3 class="sec-title">Kartu</h3>
+  <p class="sec-desc">Tiga kartu contoh dengan gaya border, bayangan, dan radius tiap tema.</p>
+  <div class="cards">
+    <div class="card"><div class="k">Fitur</div><h3>Kartu Pertama</h3><p>Deskripsi singkat yang menjelaskan isi kartu dengan bahasa sederhana dan jelas.</p><a href="#kartu">Pelajari →</a></div>
+    <div class="card"><div class="k">Layanan</div><h3>Kartu Kedua</h3><p>Setiap tema memberi kartu kepribadian berbeda: bayangan lembut, keras, atau kaca.</p><a href="#kartu">Pelajari →</a></div>
+    <div class="card"><div class="k">Info</div><h3>Kartu Ketiga</h3><p>Perhatikan radius sudut, ketebalan border, dan cara kartu merespons hover.</p><a href="#kartu">Pelajari →</a></div>
+  </div>
+</section>
+
+<!-- KOMPONEN KHAS -->
+<section class="demo container reveal">
+  <div class="sec-tag">Referensi</div>
+  <h3 class="sec-title">Komponen Khas</h3>
+  <p class="sec-desc">Satu komponen signature yang menjadi ciri tiap tema.</p>
+  <div class="sig-panel">
+    <div data-sig="ceria">
+      <div class="stickers"><span class="sticker">★ seru!</span><span class="sticker">warna-warni</span><span class="sticker">~ playful ~</span></div>
+      <p style="text-align:center;color:var(--ink-soft);margin-top:18px">Ceria: stiker mengambang + blob gradien di latar.</p>
+    </div>
+    <div data-sig="neon">
+      <div class="terminal"><span class="p">$</span> ./jalankan --mode=masa-depan<br><span class="p">></span> partikel: aktif <span class="p">|</span> glow: maksimal</div>
+    </div>
+    <div data-sig="minimal">
+      <div class="big-quote">Kesederhanaan adalah kecanggihan yang paling sulit dicapai.</div>
+    </div>
+    <div data-sig="brutalist">
+      <div class="marquee"><div class="marquee-track"><span>★ tanpa basa-basi</span><span>★ hitam putih</span><span>★ tegas &amp; jujur</span><span>★ tanpa basa-basi</span><span>★ hitam putih</span><span>★ tegas &amp; jujur</span></div></div>
+    </div>
+    <div data-sig="glass">
+      <div class="glass-demo"><h3 style="font-family:var(--font-head);font-size:1.4rem;margin-bottom:8px">Panel Kaca Buram</h3><p style="color:var(--ink-soft)">Konten di balik panel ini terlihat samar — efek frosted glass dengan blur 20px.</p></div>
+    </div>
+    <div data-sig="vaporwave">
+      <div class="suns"><div class="sun"></div></div>
+      <p style="text-align:center;color:var(--ink-soft);margin-top:14px;font-family:var(--font-mono)">matahari retro + lantai grid perspektif</p>
+    </div>
+    <div data-sig="organic">
+      <div class="organic-card"><span class="sprout">🌱</span><h3 style="font-family:var(--font-head);font-size:1.4rem;margin-bottom:8px">Tumbuh alami, tenang, seimbang</h3><p style="color:var(--ink-soft)">Bentuk daun dan sudut membulat yang lembut seperti alam.</p></div>
+    </div>
+    <div data-sig="editorial">
+      <div class="dateline"><span>Edisi Pagi</span><span>Referensi Desain</span></div>
+      <div class="article">Surat kabar punya aturan main yang berusia ratusan tahun: hierarki jelas, kolom rapi, dan huruf kapital pembuka yang gagah. Gaya editorial membawa wibawa cetak ke layar kaca — cocok untuk konten yang ingin dianggap serius. Aturan tipis memisahkan, bukan mendekorasi.</div>
+    </div>
+    <div data-sig="corporate">
+      <div class="badges"><span class="badge"><i>✓</i> Terpercaya</span><span class="badge"><i>★</i> 4.9/5 Rating</span><span class="badge"><i>⚡</i> 99.9% Uptime</span></div>
+      <p style="text-align:center;color:var(--ink-soft);margin-top:16px">Lencana kepercayaan: pola khas situs SaaS dan company profile.</p>
+    </div>
+    <div data-sig="pastel">
+      <div class="stickers"><span class="sticker">♡ gemas</span><span class="sticker">✿ lembut</span><span class="sticker">☆ manis</span></div>
+      <p style="text-align:center;color:var(--ink-soft);margin-top:18px">Pastel Dream: semuanya membulat, bertitik, dan manis.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site container">
+  <p><b>Galeri 10 Desain</b> — galeri referensi tema untuk dipakai ulang di proyek apa pun.<br>Dibuat sebagai pendamping <i>design.md</i> di repo yang sama.</p>
+</footer>
+</main>
+
+<nav id="switcher" aria-label="Pilih desain">
+  <div class="row">
+    <button class="nav-arrow" id="prev" aria-label="Desain sebelumnya">←</button>
+    <div id="theme-list" role="tablist"></div>
+    <button class="nav-arrow" id="next" aria-label="Desain berikutnya">→</button>
+    <span class="hint">← → di keyboard juga bisa</span>
+  </div>
+</nav>
+<script>
+/* ============ DATA 10 TEMA ============ */
+const THEMES=[
+ {id:"ceria",name:"Ceria",persona:"Playful & colorful — gradien ceria, bentuk melayang, animasi mantul yang fun.",fit:"Cocok untuk: <b>personal brand kreator, startup playful, landing produk konsumen, event</b>.",
+  colors:[["Latar","#fdf6ff"],["Teks","#1d1030"],["Aksen","#ff4d8d"],["Aksen 2","#7c3aed"],["Aksen 3","#22d3ee"]],
+  head:"Space Grotesk",body:"Inter"},
+ {id:"neon",name:"Neon",persona:"Dark & cyber — partikel berpendar, teks glitch, glow neon futuristik.",fit:"Cocok untuk: <b>portfolio developer, produk SaaS/tech, gaming, event teknologi</b>.",
+  colors:[["Latar","#050510"],["Teks","#e8f6ff"],["Aksen","#00f0ff"],["Aksen 2","#ff2fd6"],["Aksen 3","#a3ff12"]],
+  head:"Space Grotesk",body:"Inter"},
+ {id:"minimal",name:"Minimal",persona:"Elegan — tipografi serif besar, whitespace lega, gerak sinematik yang tenang.",fit:"Cocok untuk: <b>company profile, agency, fotografer/arsitek, publikasi editorial</b>.",
+  colors:[["Latar","#faf9f6"],["Teks","#141414"],["Aksen","#141414"],["Aksen 2","#8a7a5c"],["Aksen 3","#c9c2b4"]],
+  head:"Playfair Display",body:"Inter"},
+ {id:"brutalist",name:"Brutalist",persona:"Raw & jujur — border tebal hitam, bayangan keras, tanpa lengkung sama sekali.",fit:"Cocok untuk: <b>studio kreatif edgy, zine digital, portofolio anti-mainstream</b>.",
+  colors:[["Latar","#ffffff"],["Teks","#000000"],["Aksen","#ff3d00"],["Hitam","#000000"],["Aksen 3","#ff3d00"]],
+  head:"Space Grotesk",body:"Inter + Space Mono"},
+ {id:"glass",name:"Glassmorphism",persona:"Frosted glass — kartu kaca buram melayang di atas gradien lembut.",fit:"Cocok untuk: <b>aplikasi modern, dashboard, landing produk digital</b>.",
+  colors:[["Latar","#dbeafe → #fce7f3"],["Teks","#1e1b4b"],["Aksen","#7c3aed"],["Aksen 2","#2563eb"],["Aksen 3","#db2777"]],
+  head:"Outfit",body:"Inter"},
+ {id:"vaporwave",name:"Vaporwave",persona:"Retro 80-an — matahari bergaris, lantai grid perspektif, teks chrome.",fit:"Cocok untuk: <b>event musik, brand streetwear, halaman eksperimental</b>.",
+  colors:[["Latar","#1a0b2e"],["Teks","#fdf4ff"],["Aksen","#ff71ce"],["Aksen 2","#01cdfe"],["Aksen 3","#fffb96"]],
+  head:"Orbitron",body:"Inter + VT323"},
+ {id:"organic",name:"Organic",persona:"Alami & menenangkan — warna daun, sudut membulat, bentuk seperti alam.",fit:"Cocok untuk: <b>brand wellness, produk organik, kafe, travel alam</b>.",
+  colors:[["Latar","#f7f4ec"],["Teks","#2d3a2e"],["Aksen","#4a7c59"],["Aksen 2","#8fbf6b"],["Aksen 3","#d9e8c9"]],
+  head:"Fraunces",body:"Inter"},
+ {id:"editorial",name:"Editorial",persona:"Wibawa koran — kolom ganda, huruf kapital pembuka, garis aturan tipis.",fit:"Cocok untuk: <b>media/berita, blog panjang, company profile formal</b>.",
+  colors:[["Latar","#fbfbf8"],["Teks","#111111"],["Aksen","#c1121f"],["Aksen 2","#111111"],["Aksen 3","#8a8a8a"]],
+  head:"Libre Baskerville",body:"Libre Baskerville"},
+ {id:"corporate",name:"Corporate",persona:"Rapi & meyakinkan — struktur jelas, lencana kepercayaan, biru profesional.",fit:"Cocok untuk: <b>SaaS, company profile, jasa profesional, B2B</b>.",
+  colors:[["Latar","#ffffff"],["Teks","#0f1b2d"],["Aksen","#2563eb"],["Aksen 2","#0ea5e9"],["Aksen 3","#10b981"]],
+  head:"Plus Jakarta Sans",body:"Plus Jakarta Sans"},
+ {id:"pastel",name:"Pastel Dream",persona:"Cute & manis — semuanya membulat, pola titik-titik, warna permen.",fit:"Cocok untuk: <b>brand anak, bakery, produk lifestyle gemas</b>.",
+  colors:[["Latar","#fff7fb"],["Teks","#5b3a4e"],["Aksen","#ff8fc7"],["Aksen 2","#7cc4ff"],["Aksen 3","#ffd98a"]],
+  head:"Quicksand",body:"Quicksand"},
+];
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let current=0;
+
+/* ============ BANGUN SWITCHER ============ */
+const listEl=document.getElementById("theme-list");
+THEMES.forEach((t,i)=>{
+  const b=document.createElement("button");
+  b.className="theme-btn";b.setAttribute("role","tab");
+  b.innerHTML=`<span class="n">${i+1}</span><span>${t.name}</span>`;
+  b.addEventListener("click",()=>setTheme(i));
+  listEl.appendChild(b);
+});
+
+/* ============ GANTI TEMA ============ */
+function setTheme(i){
+  current=(i+THEMES.length)%THEMES.length;
+  const t=THEMES[current];
+  document.documentElement.setAttribute("data-theme",t.id);
+  try{localStorage.setItem("gallery-theme",t.id)}catch(e){}
+  document.querySelectorAll(".theme-btn").forEach((b,j)=>b.classList.toggle("active",j===current));
+  // panel intro
+  document.getElementById("intro-num").textContent=`DESAIN ${String(current+1).padStart(2,"0")} / 10`;
+  document.getElementById("intro-name").textContent=t.name;
+  document.getElementById("intro-persona").textContent=t.persona;
+  document.getElementById("intro-fit").innerHTML=t.fit;
+  // label font
+  document.getElementById("font-head-label").textContent="Heading — "+t.head;
+  document.getElementById("font-body-label").textContent="Body — "+t.body;
+  buildSwatches(t);
+  // scroll tombol aktif ke tengah
+  const btn=listEl.children[current];
+  if(btn)btn.scrollIntoView({inline:"center",block:"nearest",behavior:reduceMotion?"auto":"smooth"});
+  document.title=`${t.name} — Galeri 10 Desain`;
+}
+
+/* ============ SWATCH + SALIN HEX ============ */
+function buildSwatches(t){
+  const wrap=document.getElementById("swatches");wrap.innerHTML="";
+  t.colors.forEach(([name,val])=>{
+    const isGrad=val.includes("→");
+    const d=document.createElement("div");d.className="swatch";
+    d.innerHTML=`<div class="chip" style="background:${isGrad?`linear-gradient(120deg,#dbeafe,#e9d5ff,#fce7f3)`:`${val}`}"></div>
+      <div class="meta"><span class="name">${name}</span><span class="hex">${val}</span></div>
+      <span class="copied" style="left:14px;bottom:12px">disalin!</span>`;
+    d.addEventListener("click",()=>{
+      const done=()=>{d.classList.add("flash");setTimeout(()=>d.classList.remove("flash"),900)};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(val).then(done).catch(done)}
+      else{const ta=document.createElement("textarea");ta.value=val;document.body.appendChild(ta);ta.select();try{document.execCommand("copy")}catch(e){}ta.remove();done()}
+    });
+    wrap.appendChild(d);
+  });
+}
+
+/* ============ NAVIGASI ============ */
+document.getElementById("prev").addEventListener("click",()=>setTheme(current-1));
+document.getElementById("next").addEventListener("click",()=>setTheme(current+1));
+addEventListener("keydown",e=>{
+  if(e.key==="ArrowLeft")setTheme(current-1);
+  else if(e.key==="ArrowRight")setTheme(current+1);
+});
+
+/* ============ PARTIKEL NEON (satu-satunya canvas) ============ */
+const cv=document.getElementById("bg-canvas"),cx=cv.getContext("2d");
+let parts=[],raf=null;
+function sizeCanvas(){cv.width=innerWidth;cv.height=innerHeight}
+function neonLoop(){
+  if(document.documentElement.getAttribute("data-theme")!=="neon"){raf=null;return}
+  cx.clearRect(0,0,cv.width,cv.height);
+  const cols=["#00f0ff","#ff2fd6","#a3ff12"];
+  parts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=cv.width;if(p.x>cv.width)p.x=0;if(p.y<0)p.y=cv.height;if(p.y>cv.height)p.y=0;
+    cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fillStyle=p.c;cx.globalAlpha=.7;cx.fill();cx.globalAlpha=1;
+  });
+  raf=requestAnimationFrame(neonLoop);
+}
+function neonStart(){
+  if(raf||reduceMotion)return;
+  sizeCanvas();parts=[];
+  const cols=["#00f0ff","#ff2fd6","#a3ff12"];
+  for(let i=0;i<70;i++)parts.push({x:Math.random()*cv.width,y:Math.random()*cv.height,
+    vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*2.2+.6,c:cols[i%3]});
+  neonLoop();
+}
+addEventListener("resize",()=>{if(document.documentElement.getAttribute("data-theme")==="neon")sizeCanvas()});
+// pantau pergantian tema untuk canvas
+new MutationObserver(()=>{neonStart()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+/* ============ REVEAL ON SCROLL ============ */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll(".reveal").forEach(el=>{reduceMotion?el.classList.add("in"):io.observe(el)});
+
+/* ============ INIT ============ */
+(function(){
+  let start=0;
+  try{const saved=localStorage.getItem("gallery-theme");if(saved){const i=THEMES.findIndex(t=>t.id===saved);if(i>=0)start=i}}catch(e){}
+  setTheme(start);
+})();
+</script>
+</body>
+</html>
