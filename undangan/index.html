@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wedding of Yong Sheng & Putri</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Undangan Pernikahan Kudus & Resepsi Wang Yong Sheng & Putri Kinanti Boru Naibaho. Minggu, 18 Oktober 2026.">
+    <meta name="keywords"
+        content="Undangan Pernikahan, Digital Invitation, Yong Sheng Putri, Pernikahan Kristen Batak Chinese">
+    <meta name="author" content="Yong Sheng & Putri">
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Undangan Pernikahan Yong Sheng & Putri">
+    <meta property="og:description"
+        content="Keluarga besar Bpk. Wang Si MAO & Bpk. Bintang Parlindungan Naibaho mengundang Bapak/Ibu/Saudara/i ke pernikahan kudus kami.">
+    <meta property="og:image" content="assets/og-image.jpg">
+    <meta property="og:url" content="https://pernikahan-yongsheng-putri.netlify.app">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Great+Vibes&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="scroll-locked">
+
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-progress"></div>
+
+    <!-- Canvas Background untuk Partikel Debu Emas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Pemutar Audio Latar Belakang -->
+    <audio id="bgMusic" loop>
+        <source src="" type="audio/mp3">
+        Browser Anda tidak mendukung pemutar audio.
+    </audio>
+
+    <!-- Tombol Musik Mengambang (Floating Audio Control) -->
+    <button id="musicToggle" class="music-toggle hidden" aria-label="Toggle Music">
+        <i class="fa-solid fa-compact-disc fa-spin-slow"></i>
+    </button>
+
+    <!-- COVER / SPLASH SCREEN (Mencegah scroll sebelum dibuka) -->
+    <div id="coverOverlay" class="cover-overlay">
+        <div class="cover-content text-center">
+            <!-- Ornamen Batak Gorga Tradisional di Bagian Atas Cover -->
+            <div class="gorga-ornament top">
+                <svg viewBox="0 0 400 80" class="gorga-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0" y="35" width="400" height="10" rx="3" fill="#111111" />
+                    <circle cx="200" cy="40" r="14" fill="#111111" stroke="var(--gold)" stroke-width="2" />
+                    <circle cx="200" cy="40" r="6" fill="#b30006" />
+                    <path d="M 200 20 L 200 60 M 180 40 L 220 40 M 186 26 L 214 54 M 186 54 L 214 26"
+                        stroke="var(--gold)" stroke-width="1.5" />
+                    <path class="draw-path"
+                        d="M 175 40 C 150 20, 130 60, 110 40 C 95 25, 80 55, 60 40 C 45 28, 30 50, 10 40"
+                        stroke="#b30006" stroke-width="5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 175 40 C 150 20, 130 60, 110 40 C 95 25, 80 55, 60 40 C 45 28, 30 50, 10 40"
+                        stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 110 40 C 115 25, 130 25, 125 40 C 120 50, 105 45, 105 38 C 105 30, 115 32, 112 36"
+                        stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 60 40 C 65 25, 80 25, 75 40 C 70 50, 55 45, 55 38 C 55 30, 65 32, 62 36" stroke="#ffffff"
+                        stroke-width="1.5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 225 40 C 250 20, 270 60, 290 40 C 305 25, 320 55, 340 40 C 355 28, 370 50, 390 40"
+                        stroke="#b30006" stroke-width="5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 225 40 C 250 20, 270 60, 290 40 C 305 25, 320 55, 340 40 C 355 28, 370 50, 390 40"
+                        stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 290 40 C 285 25, 270 25, 275 40 C 280 50, 295 45, 295 38 C 295 30, 285 32, 288 36"
+                        stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 340 40 C 335 25, 320 25, 325 40 C 330 50, 345 45, 345 38 C 345 30, 335 32, 338 36"
+                        stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+            </div>
+
+            <p class="cover-subtext split-word">THE WEDDING OF</p>
+            <h1 class="cover-title split-text">Yong Sheng & Putri</h1>
+
+            <!-- Inisial Monogram Gabungan Batak & Tionghoa (Mata ni Ari + 囍) -->
+            <div class="monogram-container">
+                <svg viewBox="0 0 200 200" class="cover-mata-ni-ari-svg" xmlns="http://www.w3.org/2000/svg">
+                    <g class="rotating-spokes" style="transform-origin: 100px 100px;">
+                        <circle cx="100" cy="100" r="92" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="4 4"/>
+                        <circle cx="100" cy="100" r="82" fill="#111111" stroke="#b30006" stroke-width="3.5"/>
+                        <circle cx="100" cy="100" r="70" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="2 2"/>
+                        <g transform="translate(100,100)">
+                            <path d="M 0,-70 C -8,-90 8,-90 0,-70" stroke="var(--gold)" stroke-width="2" fill="none"/>
+                            <path d="M 0,-70 C -8,-90 8,-90 0,-70" stroke="var(--gold)" stroke-width="2" fill="none" transform="rotate(45)"/>
+                            <path d="M 0,-70 C -8,-90 8,-90 0,-70" stroke="var(--gold)" stroke-width="2" fill="none" transform="rotate(90)"/>
+                            <path d="M 0,-70 C -8,-90 8,-90 0,-70" stroke="var(--gold)" stroke-width="2" fill="none" transform="rotate(135)"/>
+                            <path d="M 0,-70 C -8,-90 8,-90 0,-70" stroke="var(--gold)" stroke-width="2" fill="none" transform="rotate(180)"/>
+                            <path d="M 0,-70 C -8,-90 8,-90 0,-70" stroke="var(--gold)" stroke-width="2" fill="none" transform="rotate(225)"/>
+                            <path d="M 0,-70 C -8,-90 8,-90 0,-70" stroke="var(--gold)" stroke-width="2" fill="none" transform="rotate(270)"/>
+                            <path d="M 0,-70 C -8,-90 8,-90 0,-70" stroke="var(--gold)" stroke-width="2" fill="none" transform="rotate(315)"/>
+                            <circle cx="0" cy="0" r="58" fill="none" stroke="#b30006" stroke-width="2"/>
+                        </g>
+                    </g>
+                    <text x="100" y="98" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="28" font-weight="bold" fill="var(--ivory)">Y & P</text>
+                    <text x="100" y="132" text-anchor="middle" font-family="'Inter', sans-serif" font-size="24" fill="var(--gold)">囍</text>
+                </svg>
+            </div>
+
+            <div class="guest-container card-blur">
+                <p class="guest-label">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+                <h3 id="guestName" class="guest-name">Nama Tamu</h3>
+                <p class="guest-subtext">Di Tempat</p>
+            </div>
+
+            <button id="btnOpenInvitation" class="btn-magnetic btn-primary">
+                <i class="fa-open fa-solid fa-envelope-open-text"></i> Buka Undangan
+            </button>
+
+            <!-- Ornamen Batak Gorga Tradisional di Bagian Bawah Cover (Rotated) -->
+            <div class="gorga-ornament bottom">
+                <svg viewBox="0 0 400 80" class="gorga-svg rotated" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0" y="35" width="400" height="10" rx="3" fill="#111111" />
+                    <circle cx="200" cy="40" r="14" fill="#111111" stroke="var(--gold)" stroke-width="2" />
+                    <circle cx="200" cy="40" r="6" fill="#b30006" />
+                    <path d="M 200 20 L 200 60 M 180 40 L 220 40 M 186 26 L 214 54 M 186 54 L 214 26"
+                        stroke="var(--gold)" stroke-width="1.5" />
+                    <path class="draw-path"
+                        d="M 175 40 C 150 20, 130 60, 110 40 C 95 25, 80 55, 60 40 C 45 28, 30 50, 10 40"
+                        stroke="#b30006" stroke-width="5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 175 40 C 150 20, 130 60, 110 40 C 95 25, 80 55, 60 40 C 45 28, 30 50, 10 40"
+                        stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 110 40 C 115 25, 130 25, 125 40 C 120 50, 105 45, 105 38 C 105 30, 115 32, 112 36"
+                        stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 60 40 C 65 25, 80 25, 75 40 C 70 50, 55 45, 55 38 C 55 30, 65 32, 62 36" stroke="#ffffff"
+                        stroke-width="1.5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 225 40 C 250 20, 270 60, 290 40 C 305 25, 320 55, 340 40 C 355 28, 370 50, 390 40"
+                        stroke="#b30006" stroke-width="5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 225 40 C 250 20, 270 60, 290 40 C 305 25, 320 55, 340 40 C 355 28, 370 50, 390 40"
+                        stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 290 40 C 285 25, 270 25, 275 40 C 280 50, 295 45, 295 38 C 295 30, 285 32, 288 36"
+                        stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                    <path class="draw-path"
+                        d="M 340 40 C 335 25, 320 25, 325 40 C 330 50, 345 45, 345 38 C 345 30, 335 32, 338 36"
+                        stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <main id="mainApp" class="main-app">
+
+        <!-- SECTION 1: HERO / BANNER UTAMA -->
+        <section id="hero" class="section hero-section text-center">
+            <div class="container">
+                <p class="section-tagline split-word">Kami yang Mengasihi,</p>
+                <h2 class="hero-names split-text">Wang Yong Sheng & Putri Naibaho</h2>
+                <p class="hero-date">18 . 10 . 2026</p>
+
+                <p class="batak-greeting fade-up">Horas Tondi Madingin, Pir Ma Tondi Matogu</p>
+
+                <!-- Divider Gorga Batak Indah -->
+                <div class="gorga-divider">
+                    <svg viewBox="0 0 400 40" class="gorga-divider-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 0 20 L 140 20" stroke="var(--gold)" stroke-width="1.5" />
+                        <path d="M 260 20 L 400 20" stroke="var(--gold)" stroke-width="1.5" />
+                        <circle cx="200" cy="20" r="10" fill="#111111" stroke="var(--gold)" stroke-width="1.5" />
+                        <circle cx="200" cy="20" r="4" fill="#b30006" />
+                        <path d="M 200 6 L 200 12 M 200 28 L 200 34 M 186 20 L 192 20 M 208 20 L 214 20"
+                            stroke="var(--gold)" stroke-width="1" />
+                        <path d="M 140 20 C 150 10, 160 30, 170 20 C 175 15, 185 15, 180 25 C 175 30, 165 20, 170 15"
+                            stroke="#b30006" stroke-width="2.5" stroke-linecap="round" />
+                        <path d="M 260 20 C 250 10, 240 30, 230 20 C 225 15, 215 15, 220 25 C 225 30, 235 20, 230 15"
+                            stroke="#b30006" stroke-width="2.5" stroke-linecap="round" />
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: BIBLE VERSE -->
+        <section id="verse" class="section verse-section text-center">
+            <div class="container">
+                <div class="card-blur fade-up">
+                    <i class="fa-solid fa-quote-left quote-icon"></i>
+                    <p class="bible-quote">
+                        "Demikianlah mereka bukan lagi dua, melainkan satu. Karena itu, apa yang telah dipersatukan
+                        Allah, tidak boleh diceraikan manusia."
+                    </p>
+                    <p class="bible-reference">Matius 19:6</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: MEMPELAI (BRIDE & GROOM) -->
+        <section id="mempelai" class="section mempelai-section">
+            <div class="container text-center">
+                <div class="section-header">
+                    <h2 class="section-title split-text">Mempelai</h2>
+                    <p class="section-subtitle">Dengan memohon rahmat Tuhan Yesus Kristus, kami bermaksud
+                        menyelenggarakan pernikahan kami:</p>
+                </div>
+
+                <div class="mempelai-grid">
+                    <!-- Mempelai Pria (Chinese) -->
+                    <div class="mempelai-card groom-card" data-tilt>
+                        <div class="photo-wrapper">
+                            <div class="photo-border"></div>
+                            <!-- Jika tidak ada foto asli, CSS akan mengisi background gradient premium -->
+                            <img id="groomPhoto" src="" alt="Wang Yong Sheng" class="mempelai-img parallax-img">
+                        </div>
+                        <div class="mempelai-info">
+                            <span class="mempelai-chinese-name" id="groomChineseName"></span>
+                            <h3 id="groomFullName" class="mempelai-name split-text">Wang Yong Sheng</h3>
+                            <p class="mempelai-parents" id="groomParents">Putra dari Bpk. Wang Si MAO & Ibu Jing Fen
+                                Lian</p>
+                            <p class="mempelai-bio" id="groomBio"></p>
+                            <a id="groomInstagram" href="#" target="_blank" class="instagram-link btn-magnetic">
+                                <i class="fa-brands fa-instagram"></i> @yongsheng_wang
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Lambang Kebahagiaan & Cinta di Tengah -->
+                    <div class="mempelai-center">
+                        <div class="heart-monogram">
+                            <span>&</span>
+                            <div class="shuang-xi-gold">囍</div>
+                        </div>
+                    </div>
+
+                    <!-- Mempelai Wanita (Batak) -->
+                    <div class="mempelai-card bride-card" data-tilt>
+                        <div class="photo-wrapper">
+                            <div class="photo-border"></div>
+                            <img id="bridePhoto" src="" alt="Putri Naibaho" class="mempelai-img parallax-img">
+                        </div>
+                        <div class="mempelai-info">
+                            <h3 id="brideFullName" class="mempelai-name split-text">Putri Kinanti Naibaho</h3>
+                            <p class="mempelai-parents" id="brideParents">Putri dari Bpk. Bintang Parlindungan Naibaho &
+                                Ibu Irma Lidia Boru Gultom</p>
+                            <p class="mempelai-bio" id="brideBio"></p>
+                            <a id="brideInstagram" href="#" target="_blank" class="instagram-link btn-magnetic">
+                                <i class="fa-brands fa-instagram"></i> @putri_naibaho
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: COUNTDOWN TIMER -->
+        <section id="countdownSection" class="section countdown-section text-center">
+            <div class="container">
+                <h3 class="countdown-title">Menuju Hari Bahagia</h3>
+                <div class="countdown-wrapper card-blur">
+                    <div class="countdown-item">
+                        <span id="days" class="countdown-value">00</span>
+                        <span class="countdown-label">Hari</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="hours" class="countdown-value">00</span>
+                        <span class="countdown-label">Jam</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="minutes" class="countdown-value">00</span>
+                        <span class="countdown-label">Menit</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="seconds" class="countdown-value">00</span>
+                        <span class="countdown-label">Detik</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: WAKTU & LOKASI ACARA -->
+        <section id="acara" class="section acara-section">
+            <div class="container">
+                <div class="section-header text-center">
+                    <h2 class="section-title split-text">Waktu & Tempat</h2>
+                    <p class="section-subtitle">Pemberkatan Suci & Resepsi Pernikahan kami akan diselenggarakan pada:
+                    </p>
+                </div>
+
+                <div class="acara-grid">
+                    <!-- Pemberkatan -->
+                    <div class="acara-card card-blur fade-left">
+                        <div class="acara-badge"><i class="fa-solid fa-cross"></i></div>
+                        <h3 id="pemberkatanTitle" class="event-title">Pemberkatan Pernikahan</h3>
+
+                        <div class="event-detail-item">
+                            <i class="fa-regular fa-calendar-days"></i>
+                            <p id="pemberkatanDate">Minggu, 18 Oktober 2026</p>
+                        </div>
+
+                        <div class="event-detail-item">
+                            <i class="fa-regular fa-clock"></i>
+                            <p id="pemberkatanTime">09:00 WIB - 11:00 WIB</p>
+                        </div>
+
+                        <div class="event-detail-item">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                            <div>
+                                <h4 id="pemberkatanVenue">HKBP Sudirman Jakarta</h4>
+                                <p id="pemberkatanAddress" class="venue-address">Jl. Jenderal Sudirman No. 45, Jakarta
+                                    Selatan</p>
+                            </div>
+                        </div>
+
+                        <!-- Iframe Embed Google Maps -->
+                        <div class="map-embed-container">
+                            <iframe id="pemberkatanMapIframe" src="" width="100%" height="200" style="border:0;"
+                                allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+
+                        <div class="event-buttons">
+                            <a id="pemberkatanMapsBtn" href="#" target="_blank"
+                                class="btn-magnetic btn-secondary btn-sm">
+                                <i class="fa-solid fa-location-arrow"></i> Petunjuk Arah
+                            </a>
+                            <a id="pemberkatanCalBtn" href="#" target="_blank" class="btn-magnetic btn-outline btn-sm">
+                                <i class="fa-regular fa-calendar-plus"></i> Google Calendar
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Resepsi -->
+                    <div class="acara-card card-blur fade-right">
+                        <div class="acara-badge"><i class="fa-solid fa-martini-glass-citrus"></i></div>
+                        <h3 id="resepsiTitle" class="event-title">Resepsi Pernikahan</h3>
+
+                        <div class="event-detail-item">
+                            <i class="fa-regular fa-calendar-days"></i>
+                            <p id="resepsiDate">Minggu, 18 Oktober 2026</p>
+                        </div>
+
+                        <div class="event-detail-item">
+                            <i class="fa-regular fa-clock"></i>
+                            <p id="resepsiTime">12:00 WIB - 15:00 WIB</p>
+                        </div>
+
+                        <div class="event-detail-item">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                            <div>
+                                <h4 id="resepsiVenue">Grand Ballroom Hotel Indonesia Kempinski</h4>
+                                <p id="resepsiAddress" class="venue-address">Jl. MH Thamrin No. 1, Jakarta Pusat</p>
+                            </div>
+                        </div>
+
+                        <!-- Iframe Embed Google Maps -->
+                        <div class="map-embed-container">
+                            <iframe id="resepsiMapIframe" src="" width="100%" height="200" style="border:0;"
+                                allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+
+                        <div class="event-buttons">
+                            <a id="resepsiMapsBtn" href="#" target="_blank" class="btn-magnetic btn-secondary btn-sm">
+                                <i class="fa-solid fa-location-arrow"></i> Petunjuk Arah
+                            </a>
+                            <a id="resepsiCalBtn" href="#" target="_blank" class="btn-magnetic btn-outline btn-sm">
+                                <i class="fa-regular fa-calendar-plus"></i> Google Calendar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: GALERI FOTO (LIGHTBOX) -->
+        <section id="galeri" class="section galeri-section">
+            <div class="container">
+                <div class="section-header text-center">
+                    <h2 class="section-title split-text">Galeri Kebahagiaan</h2>
+                    <p class="section-subtitle">Sekilas momen perjalanan cinta kami berdua</p>
+                </div>
+
+                <!-- Grid Galeri Grid/Masonry -->
+                <div class="gallery-grid" id="galleryGrid">
+                    <!-- Elemen galeri akan di-generate oleh app.js berdasarkan config.js -->
+                </div>
+            </div>
+        </section>
+
+        <!-- LIGHTBOX MODAL UNTUK GALERI -->
+        <div id="lightbox" class="lightbox">
+            <span class="lightbox-close">&times;</span>
+            <span class="lightbox-prev">&#10094;</span>
+            <img class="lightbox-content" id="lightboxImg">
+            <span class="lightbox-next">&#10095;</span>
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+        </div>
+
+        <!-- SECTION 7: KADO DIGITAL (WEDDING GIFT) -->
+        <section id="kado" class="section kado-section text-center">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title split-text">Kado Digital</h2>
+                    <p class="section-subtitle">Doa restu Anda merupakan karunia terindah bagi kami. Namun, apabila Anda
+                        ingin memberikan tanda kasih secara digital, Anda dapat mengirimkannya melalui:</p>
+                </div>
+
+                <div class="gift-container">
+                    <!-- Rekening Bank (Dihasilkan oleh app.js) -->
+                    <div class="bank-accounts-grid" id="bankAccounts"></div>
+
+                    <!-- Hadiah Fisik / Kado Alamat -->
+                    <div class="gift-address card-blur fade-up">
+                        <i class="fa-solid fa-box-open gift-address-icon"></i>
+                        <h3>Kirim Hadiah Fisik</h3>
+                        <p class="gift-address-desc">Silakan kirimkan kado/hadiah fisik ke alamat berikut:</p>
+
+                        <div class="address-details">
+                            <strong id="giftRecipient">Grace Siregar / Albert Chen</strong><br>
+                            <span id="giftPhone">0812-3456-7890</span><br>
+                            <p id="giftAddress" class="full-address">Jl. H. R. Rasuna Said...</p>
+                        </div>
+
+                        <button id="btnCopyAddress" class="btn-magnetic btn-outline btn-sm">
+                            <i class="fa-regular fa-copy"></i> Salin Alamat Hadiah
+                        </button>
+                        <span class="copy-toast" id="addressCopyToast">Alamat berhasil disalin!</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 8: RSVP & WISHES (BUKU TAMU) -->
+        <section id="rsvp" class="section rsvp-section">
+            <div class="container">
+                <div class="section-header text-center">
+                    <h2 class="section-title split-text">RSVP & Wishes</h2>
+                    <p class="section-subtitle">Bantu kami mempersiapkan resepsi dengan mengonfirmasi kehadiran Anda dan
+                        berikan doa restu hangat Anda.</p>
+                </div>
+
+                <div class="rsvp-grid">
+                    <!-- Form Konfirmasi Kehadiran -->
+                    <div class="rsvp-form-container card-blur fade-left">
+                        <h3>Konfirmasi Kehadiran</h3>
+                        <form id="rsvpForm" class="rsvp-form">
+                            <div class="form-group">
+                                <label for="formName">Nama Lengkap</label>
+                                <input type="text" id="formName" name="name" required placeholder="Masukkan nama Anda">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="formStatus">Konfirmasi Kehadiran</label>
+                                <select id="formStatus" name="status" required>
+                                    <option value="" disabled selected>-- Pilih Kehadiran --</option>
+                                    <option value="Hadir">Saya Akan Hadir</option>
+                                    <option value="Ragu-ragu">Masih Ragu-ragu</option>
+                                    <option value="Tidak Hadir">Maaf, Tidak Bisa Hadir</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="formGuestsGroup">
+                                <label for="formGuests">Jumlah Tamu</label>
+                                <select id="formGuests" name="guests">
+                                    <option value="1">1 Orang</option>
+                                    <option value="2">2 Orang</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="formMessage">Ucapan / Doa Restu</label>
+                                <textarea id="formMessage" name="message" rows="4" required
+                                    placeholder="Tulis ucapan selamat dan doa restu Anda untuk kami..."></textarea>
+                            </div>
+
+                            <button type="submit" id="btnSubmitRSVP" class="btn-magnetic btn-primary btn-block">
+                                <i class="fa-solid fa-paper-plane"></i> Kirim Konfirmasi
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Tampilan Daftar Ucapan (Wishes List) -->
+                    <div class="wishes-container card-blur fade-right">
+                        <h3>Buku Tamu & Ucapan (<span id="wishesCount">0</span>)</h3>
+                        <div class="wishes-list" id="wishesList">
+                            <!-- Daftar ucapan akan di-render secara dinamis di sini -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 9: FOOTER (PENUTUP) -->
+        <footer class="footer text-center">
+            <div class="container">
+                <!-- Ornamen Batak Gorga Tradisional Pembuka Footer -->
+                <div class="gorga-ornament footer-ornament">
+                    <svg viewBox="0 0 400 80" class="gorga-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="35" width="400" height="10" rx="3" fill="#111111" />
+                        <circle cx="200" cy="40" r="14" fill="#111111" stroke="var(--gold)" stroke-width="2" />
+                        <circle cx="200" cy="40" r="6" fill="#b30006" />
+                        <path d="M 200 20 L 200 60 M 180 40 L 220 40 M 186 26 L 214 54 M 186 54 L 214 26"
+                            stroke="var(--gold)" stroke-width="1.5" />
+                        <path class="draw-path"
+                            d="M 175 40 C 150 20, 130 60, 110 40 C 95 25, 80 55, 60 40 C 45 28, 30 50, 10 40"
+                            stroke="#b30006" stroke-width="5" stroke-linecap="round" />
+                        <path class="draw-path"
+                            d="M 175 40 C 150 20, 130 60, 110 40 C 95 25, 80 55, 60 40 C 45 28, 30 50, 10 40"
+                            stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" />
+                        <path class="draw-path"
+                            d="M 110 40 C 115 25, 130 25, 125 40 C 120 50, 105 45, 105 38 C 105 30, 115 32, 112 36"
+                            stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                        <path class="draw-path"
+                            d="M 60 40 C 65 25, 80 25, 75 40 C 70 50, 55 45, 55 38 C 55 30, 65 32, 62 36"
+                            stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                        <path class="draw-path"
+                            d="M 225 40 C 250 20, 270 60, 290 40 C 305 25, 320 55, 340 40 C 355 28, 370 50, 390 40"
+                            stroke="#b30006" stroke-width="5" stroke-linecap="round" />
+                        <path class="draw-path"
+                            d="M 225 40 C 250 20, 270 60, 290 40 C 305 25, 320 55, 340 40 C 355 28, 370 50, 390 40"
+                            stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" />
+                        <path class="draw-path"
+                            d="M 290 40 C 285 25, 270 25, 275 40 C 280 50, 295 45, 295 38 C 295 30, 285 32, 288 36"
+                            stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                        <path class="draw-path"
+                            d="M 340 40 C 335 25, 320 25, 325 40 C 330 50, 345 45, 345 38 C 345 30, 335 32, 338 36"
+                            stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                </div>
+
+                <h3 class="footer-thanks">Terima Kasih</h3>
+                <p class="footer-subtitle">Atas kehadiran dan doa restu Bapak/Ibu/Saudara/i sekalian.</p>
+                <h2 class="footer-names">Yong Sheng & Putri</h2>
+
+                <!-- Hak Cipta & Info Pembuat -->
+                <p class="copyright">&copy; 2026 Yong Sheng & Putri. All Rights Reserved.</p>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- File Konfigurasi -->
+    <script src="config.js"></script>
+    <!-- Logika Utama Aplikasi -->
+    <script src="app.js"></script>
+</body>
+
+</html>
