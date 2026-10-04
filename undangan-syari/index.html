@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Undangan Pernikahan — Fauzan & Fewia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sage:#5f7355; --sage-d:#44523c; --sage-l:#eef2e9;
+  --cream:#faf8f2; --gold:#b9975b; --gold-l:#e8d9b8;
+  --ink:#3c443a; --mut:#7a8276;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--cream);color:var(--ink);font-family:'Jost',sans-serif;font-size:15px;line-height:1.7;overflow-x:hidden}
+/* subtle islamic pattern */
+.pattern{background-image:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0l10 30 30 10-30 10-10 30-10-30-30-10 30-10z' fill='none' stroke='%235f7355' stroke-opacity='0.08'/%3E%3C/svg%3E")}
+/* cover */
+#cover{position:fixed;inset:0;z-index:100;background:linear-gradient(160deg,#f4f1e8 0%,#e9efe2 60%,#dfe7d4 100%);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;transition:opacity .8s,visibility .8s}
+#cover.hide{opacity:0;visibility:hidden}
+#cover .inner{max-width:420px;animation:fadeUp 1.2s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.orn{font-size:28px;color:var(--gold);letter-spacing:8px;margin:10px 0}
+#cover .lbl{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--mut)}
+#cover h1{font-family:'Cormorant Garamond',serif;font-size:52px;color:var(--sage-d);margin:12px 0 4px;line-height:1.15}
+#cover h1 .amp{font-style:italic;color:var(--gold);font-size:40px}
+.bismillah{font-family:'Amiri',serif;font-size:30px;color:var(--sage-d);margin-bottom:6px}
+.guest{margin:22px 0 6px;font-size:13px;color:var(--mut)}
+.guest b{display:block;font-size:19px;color:var(--sage-d);margin-top:4px;font-weight:600}
+.btn{display:inline-block;background:var(--sage);color:#fff;border:none;padding:14px 42px;border-radius:40px;font-family:'Jost';font-size:15px;letter-spacing:2px;cursor:pointer;margin-top:18px;box-shadow:0 8px 24px rgba(95,115,85,.35);transition:all .2s;text-transform:uppercase}
+.btn:hover{background:var(--sage-d);transform:translateY(-2px)}
+.btn:active{transform:scale(.97)}
+/* sections */
+section{padding:64px 24px;max-width:640px;margin:0 auto;text-align:center;opacity:0;transform:translateY(30px);transition:opacity .8s,transform .8s}
+section.vis{opacity:1;transform:none}
+.sec-lbl{font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+h2.sec{font-family:'Cormorant Garamond',serif;font-size:34px;color:var(--sage-d);margin-bottom:14px;font-weight:600}
+.divider{display:flex;align-items:center;gap:12px;justify-content:center;margin:18px auto;max-width:280px;color:var(--gold)}
+.divider::before,.divider::after{content:'';height:1px;flex:1;background:linear-gradient(90deg,transparent,var(--gold-l))}
+.divider::after{background:linear-gradient(90deg,var(--gold-l),transparent)}
+.verse{font-family:'Amiri',serif;font-size:24px;color:var(--sage-d);line-height:2;margin:10px 0}
+.verse-src{font-size:13px;color:var(--mut);font-style:italic}
+.verse-id{font-size:14px;color:var(--mut);margin-top:12px;font-style:italic}
+/* couple */
+.couple{margin:26px 0}
+.couple .nm{font-family:'Cormorant Garamond',serif;font-size:38px;color:var(--sage-d);font-weight:700}
+.couple .amp2{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:30px;color:var(--gold);margin:6px 0}
+/* countdown */
+#cd{display:flex;gap:10px;justify-content:center;margin:24px 0;flex-wrap:wrap}
+.cd-box{background:#fff;border:1px solid var(--gold-l);border-radius:14px;min-width:72px;padding:14px 6px;box-shadow:0 4px 14px rgba(95,115,85,.08)}
+.cd-box b{display:block;font-size:26px;color:var(--sage-d);font-family:'Cormorant Garamond',serif}
+.cd-box span{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mut)}
+/* event card */
+.card{background:#fff;border:1px solid var(--gold-l);border-radius:20px;padding:30px 24px;margin:16px 0;box-shadow:0 10px 30px rgba(95,115,85,.1)}
+.card h3{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--sage-d);margin-bottom:6px}
+.card .dt{font-size:17px;font-weight:600;color:var(--ink);margin:8px 0}
+.card .tm{font-size:15px;color:var(--sage);font-weight:500}
+.card .loc{font-size:14px;color:var(--mut);margin-top:8px}
+.btn-o{display:inline-block;border:1px solid var(--sage);color:var(--sage);padding:10px 28px;border-radius:30px;font-size:13px;letter-spacing:1px;text-decoration:none;margin-top:14px;transition:all .2s}
+.btn-o:hover{background:var(--sage);color:#fff}
+/* forms */
+.fgroup{margin-bottom:12px;text-align:left}
+.fgroup label{font-size:12px;color:var(--mut);font-weight:600;display:block;margin-bottom:4px}
+.fgroup input,.fgroup select,.fgroup textarea{width:100%;border:1px solid var(--gold-l);background:#fff;border-radius:12px;padding:12px;font-family:'Jost';font-size:14px;color:var(--ink)}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{outline:none;border-color:var(--sage)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* wishes */
+.wish{background:#fff;border:1px solid var(--gold-l);border-radius:14px;padding:14px 16px;margin:10px 0;text-align:left}
+.wish b{color:var(--sage-d);font-size:14px}
+.wish .st{font-size:11px;color:var(--gold);margin-left:8px}
+.wish p{font-size:13.5px;color:var(--ink);margin-top:4px}
+.wish .dt2{font-size:11px;color:var(--mut);margin-top:6px}
+/* gift */
+.gift-box{background:linear-gradient(140deg,#fff,#f4efe2);border:1px dashed var(--gold);border-radius:16px;padding:20px;margin:12px 0}
+.gift-box .bank{font-weight:600;color:var(--sage-d);font-size:16px}
+.gift-box .rek{font-size:22px;letter-spacing:2px;color:var(--ink);margin:6px 0;font-weight:600}
+.copybtn{background:var(--gold);color:#fff;border:none;padding:8px 20px;border-radius:20px;font-size:12px;cursor:pointer;letter-spacing:1px}
+/* footer */
+footer{padding:50px 24px;text-align:center;color:var(--mut);font-size:13px}
+footer .nm{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--sage-d)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--sage-d);color:#fff;padding:12px 26px;border-radius:30px;font-size:14px;z-index:200;transition:transform .3s;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+#toast.show{transform:translateX(-50%) translateY(0)}
+@media(max-width:480px){#cover h1{font-size:42px}.couple .nm{font-size:30px}}
+</style>
+</head>
+<body class="pattern">
+
+<!-- COVER -->
+<div id="cover">
+  <div class="inner">
+    <div class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
+    <div class="lbl">Undangan Pernikahan</div>
+    <div class="orn">✦ ✦ ✦</div>
+    <h1>Fauzan <span class="amp">&</span><br>Fewia</h1>
+    <div class="orn">✦ ✦ ✦</div>
+    <div class="guest">Kepada Yth.<br>Bapak/Ibu/Saudara/i<b id="guestName">Tamu Undangan</b></div>
+    <button class="btn" onclick="openInv()">Buka Undangan</button>
+  </div>
+</div>
+
+<!-- AYAT -->
+<section>
+  <div class="sec-lbl">Dengan Rahmat Allah SWT</div>
+  <div class="verse">وَمِنْ اٰيٰتِهٖٓ اَنْ خَلَقَ لَكُمْ مِّنْ اَنْفُسِكُمْ اَزْوَاجًا لِّتَسْكُنُوْٓا اِلَيْهَا وَجَعَلَ بَيْنَكُمْ مَّوَدَّةً وَّرَحْمَةً</div>
+  <div class="verse-src">QS. Ar-Rūm: 21</div>
+  <div class="verse-id">"Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang."</div>
+</section>
+
+<!-- MEMPELAI -->
+<section>
+  <div class="sec-lbl">Assalamu'alaikum Wr. Wb.</div>
+  <h2 class="sec">Mempelai</h2>
+  <div class="divider">✦</div>
+  <p style="color:var(--mut);font-size:14px">Dengan memohon rahmat dan ridha Allah SWT, kami bermaksud menyempurnakan separuh agama kami:</p>
+  <div class="couple">
+    <div class="nm">Fauzan</div>
+    <div class="amp2">&</div>
+    <div class="nm">Fewia</div>
+  </div>
+</section>
+
+<!-- WAKTU -->
+<section>
+  <div class="sec-lbl">Save The Date</div>
+  <h2 class="sec">Waktu Acara</h2>
+  <div class="divider">✦</div>
+  <div id="cd">
+    <div class="cd-box"><b id="cd-d">0</b><span>Hari</span></div>
+    <div class="cd-box"><b id="cd-h">0</b><span>Jam</span></div>
+    <div class="cd-box"><b id="cd-m">0</b><span>Menit</span></div>
+    <div class="cd-box"><b id="cd-s">0</b><span>Detik</span></div>
+  </div>
+  <div class="card">
+    <h3>Akad Nikah & Resepsi</h3>
+    <div class="dt">Selasa, 27 Juli 2027</div>
+    <div class="tm">Pukul 10.00 WIB — selesai</div>
+    <div class="loc">Masjid Sabilillah<br>Jl. Jend. A. Yani No. 15, Blimbing,<br>Kota Malang, Jawa Timur</div>
+    <a class="btn-o" href="https://www.google.com/maps/search/?api=1&query=Masjid+Sabilillah+Jl.+Jend.+A.+Yani+No.+15+Malang" target="_blank">📍 Lihat Google Maps</a>
+  </div>
+</section>
+
+<!-- RSVP -->
+<section>
+  <div class="sec-lbl">Konfirmasi</div>
+  <h2 class="sec">RSVP</h2>
+  <div class="divider">✦</div>
+  <div class="card" style="text-align:left">
+    <div class="fgroup"><label>Nama</label><input id="r_name" placeholder="Nama lengkap"></div>
+    <div class="frow">
+      <div class="fgroup"><label>Kehadiran</label><select id="r_attend"><option value="Hadir">Hadir, Insya Allah</option><option value="Tidak">Berhalangan</option></select></div>
+      <div class="fgroup"><label>Jumlah Tamu</label><input id="r_guests" type="number" value="1" min="1"></div>
+    </div>
+    <div class="fgroup"><label>Ucapan & Doa</label><textarea id="r_msg" rows="3" placeholder="Tuliskan doa terbaik..."></textarea></div>
+    <button class="btn" style="width:100%;margin-top:6px" onclick="sendRSVP()">Kirim</button>
+  </div>
+</section>
+
+<!-- AMPLOP -->
+<section>
+  <div class="sec-lbl">Tanda Kasih</div>
+  <h2 class="sec">Amplop Digital</h2>
+  <div class="divider">✦</div>
+  <p style="color:var(--mut);font-size:14px;margin-bottom:8px">Doa restu Anda adalah hadiah terindah. Namun jika berkenan memberi tanda kasih:</p>
+  <div class="gift-box">
+    <div class="bank">💳 Bank — <span style="color:var(--mut);font-size:13px">(segera diisi)</span></div>
+    <div class="rek">•••• •••• ••••</div>
+    <div style="font-size:13px;color:var(--mut)">a.n. Fauzan & Fewia</div>
+    <button class="copybtn" style="margin-top:10px" onclick="toast('Nomor rekening belum diisi')">Salin Nomor</button>
+  </div>
+</section>
+
+<!-- BUKU TAMU -->
+<section>
+  <div class="sec-lbl">Doa & Ucapan</div>
+  <h2 class="sec">Buku Tamu</h2>
+  <div class="divider">✦</div>
+  <div id="wishes"><p style="color:var(--mut);font-size:14px">Jadilah yang pertama memberikan doa 🤲</p></div>
+</section>
+
+<!-- PENUTUP -->
+<section>
+  <div class="orn">✦ ✦ ✦</div>
+  <p style="color:var(--mut);font-size:14px">Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kedua mempelai.<br><br>Jazakumullah khairan katsiran.</p>
+  <div style="margin-top:18px;font-size:15px;color:var(--sage-d)">Wassalamu'alaikum Wr. Wb.</div>
+  <div style="margin-top:20px"><span style="font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--sage-d)">Fauzan & Fewia</span></div>
+</section>
+
+<footer>
+  <div class="nm">F & F</div>
+  <div style="margin-top:8px">27 . 07 . 2027</div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+const WEDDING = new Date('2027-07-27T10:00:00+07:00').getTime();
+/* guest name from ?to= */
+(function(){
+  const p = new URLSearchParams(location.search).get('to');
+  if(p) document.getElementById('guestName').textContent = p;
+})();
+/* cover */
+function openInv(){
+  document.getElementById('cover').classList.add('hide');
+  document.body.style.overflow='';
+  document.querySelectorAll('section').forEach(s=>observer.observe(s));
+}
+document.body.style.overflow='hidden';
+/* reveal on scroll */
+const observer = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('vis'); }),{threshold:.12});
+/* countdown */
+function tick(){
+  let d = WEDDING - Date.now();
+  if(d<0) d=0;
+  document.getElementById('cd-d').textContent = Math.floor(d/864e5);
+  document.getElementById('cd-h').textContent = Math.floor(d/36e5)%24;
+  document.getElementById('cd-m').textContent = Math.floor(d/6e4)%60;
+  document.getElementById('cd-s').textContent = Math.floor(d/1e3)%60;
+}
+setInterval(tick,1000); tick();
+/* toast */
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+/* rsvp + wishes (localStorage) */
+const KEY='syari_wishes_v1';
+function getW(){ try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]} }
+function renderW(){
+  const w=getW(), el=document.getElementById('wishes');
+  if(!w.length){ el.innerHTML='<p style="color:var(--mut);font-size:14px">Jadilah yang pertama memberikan doa 🤲</p>'; return; }
+  el.innerHTML=[...w].reverse().map(x=>`<div class="wish"><b>${esc(x.name)}</b><span class="st">${esc(x.attend)}</span><p>${esc(x.msg)}</p><div class="dt2">${esc(x.date)}</div></div>`).join('');
+}
+function esc(s){ return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function sendRSVP(){
+  const name=document.getElementById('r_name').value.trim();
+  const msg=document.getElementById('r_msg').value.trim();
+  if(!name) return toast('Isi nama dulu ya');
+  const w=getW();
+  w.push({name, attend:document.getElementById('r_attend').value,
+    guests:document.getElementById('r_guests').value, msg:msg||'—',
+    date:new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})});
+  localStorage.setItem(KEY,JSON.stringify(w));
+  document.getElementById('r_name').value=''; document.getElementById('r_msg').value='';
+  renderW(); toast('Terima kasih atas doanya 🤲');
+}
+renderW();
+</script>
+</body>
+</html>
