@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cara Kerja Load Balancer</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; overflow:hidden; background:#050508; font-family:'Segoe UI',system-ui,sans-serif; color:#e8e8f0; }
+  #stage { position:fixed; inset:0; }
+  canvas { position:absolute; inset:0; }
+  .hud { position:absolute; z-index:10; pointer-events:none; }
+  .title { top:14px; left:0; right:0; text-align:center; }
+  .title h1 { font-size:clamp(20px,4.5vw,34px); font-weight:800; letter-spacing:1px;
+    text-shadow:0 0 18px rgba(0,229,255,.7), 0 0 46px rgba(0,229,255,.3); }
+  .title h1 .hl { color:#00e5ff; }
+  .title p { font-size:clamp(11px,2.6vw,14px); color:#9aa0b5; margin-top:4px; }
+  .badge { display:inline-block; margin-top:8px; padding:4px 14px; border-radius:20px;
+    font-size:12px; font-weight:700; letter-spacing:1px; color:#00ffa3;
+    border:1px solid rgba(0,255,163,.5); background:rgba(0,255,163,.08);
+    text-shadow:0 0 10px rgba(0,255,163,.8); pointer-events:none; }
+  .node-label { position:absolute; transform:translate(-50%,0); text-align:center; pointer-events:none; z-index:9; }
+  .node-label .nm { font-weight:700; font-size:14px; }
+  .node-label .st { font-size:11px; margin-top:2px; font-weight:600; letter-spacing:.5px; }
+  .node-label .cnt { font-size:12px; color:#ffb74d; margin-top:2px; font-variant-numeric:tabular-nums;
+    text-shadow:0 0 8px rgba(255,183,77,.7); }
+  .up .nm { color:#4dff9d; text-shadow:0 0 12px rgba(77,255,157,.8); }
+  .up .st { color:#4dff9d; }
+  .down .nm { color:#ff5252; text-shadow:0 0 12px rgba(255,82,82,.8); }
+  .down .st { color:#ff5252; }
+  .controls { position:absolute; z-index:20; bottom:14px; left:50%; transform:translateX(-50%);
+    display:flex; gap:10px; align-items:center; background:rgba(10,10,20,.75);
+    border:1px solid rgba(0,229,255,.25); border-radius:16px; padding:10px 16px;
+    backdrop-filter:blur(8px); flex-wrap:wrap; justify-content:center; max-width:94vw; }
+  .controls button { background:rgba(0,229,255,.1); border:1px solid rgba(0,229,255,.4);
+    color:#00e5ff; font-weight:700; font-size:13px; padding:8px 14px; border-radius:10px;
+    cursor:pointer; transition:all .2s; }
+  .controls button:active { transform:scale(.95); background:rgba(0,229,255,.25); }
+  .controls label { font-size:12px; color:#9aa0b5; display:flex; align-items:center; gap:6px; }
+  .controls input[type=range] { width:90px; accent-color:#00e5ff; }
+  .hint { position:absolute; z-index:10; bottom:76px; left:0; right:0; text-align:center;
+    font-size:12px; color:#6b7288; pointer-events:none; }
+  .total { position:absolute; z-index:10; top:14px; right:14px; text-align:right; pointer-events:none;
+    font-size:12px; color:#9aa0b5; }
+  .total b { color:#ffb74d; font-size:18px; text-shadow:0 0 10px rgba(255,183,77,.7); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="fx"></canvas>
+  <div class="hud title">
+    <h1>Cara Kerja <span class="hl">Load Balancer</span></h1>
+    <p>Berhenti kirim traffic ke Server 2</p><br>
+    <span class="badge">ROUND ROBIN</span>
+  </div>
+  <div class="hud total">Total request<br><b id="totalReq">0</b></div>
+  <div class="hint">Ketuk server untuk mematikan / menyalakan</div>
+  <div class="controls">
+    <button id="btnPause">⏸ Jeda</button>
+    <button id="btnReset">↺ Reset</button>
+    <label>Kecepatan <input type="range" id="speed" min="1" max="5" value="3"></label>
+  </div>
+</div>
+<script>
+const cv = document.getElementById('fx'), ctx = cv.getContext('2d');
+const stage = document.getElementById('stage');
+let W, H, DPR;
+function resize(){ DPR = Math.min(devicePixelRatio||1, 2); W = innerWidth; H = innerHeight;
+  cv.width = W*DPR; cv.height = H*DPR; cv.style.width = W+'px'; cv.style.height = H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0); layout(); }
+addEventListener('resize', resize);
+
+// ---- layout ----
+let clients=[], lb={}, servers=[];
+function layout(){
+  const cx = W/2;
+  clients = [
+    {x: cx - Math.min(W*0.32,300), y: H*0.16, icon:'📱'},
+    {x: cx,                       y: H*0.12, icon:'💻'},
+    {x: cx + Math.min(W*0.32,300), y: H*0.16, icon:'🖥️'},
+  ];
+  lb = {x: cx, y: H*0.42, w: Math.min(W*0.5,300), h: 64};
+  const sy = H*0.74;
+  const sx = [cx - Math.min(W*0.33,320), cx, cx + Math.min(W*0.33,320)];
+  servers.forEach((s,i)=>{ s.x = sx[i]; s.y = sy; });
+  positionLabels();
+}
+
+// ---- state ----
+servers = [0,1,2].map(i=>({ id:i, name:'Server '+(i+1), x:0, y:0, up: i!==1, req:0, flash:0 }));
+// Server 2 mulai DOWN seperti referensi
+let totalReq = 0, paused = false, speedMul = 1, rrIndex = 0;
+const packets = [];
+let spawnTimer = 0;
+
+// ---- DOM labels ----
+const labelEls = [];
+function positionLabels(){
+  labelEls.forEach(e=>e.remove()); labelEls.length = 0;
+  // LB label
+  const lbEl = document.createElement('div');
+  lbEl.className = 'node-label up';
+  lbEl.innerHTML = `<div class="nm" style="color:#00e5ff;text-shadow:0 0 12px rgba(0,229,255,.8)">Load Balancer</div>`;
+  lbEl.style.left = lb.x+'px'; lbEl.style.top = (lb.y + lb.h/2 + 8)+'px';
+  stage.appendChild(lbEl); labelEls.push(lbEl);
+  servers.forEach(s=>{
+    const el = document.createElement('div');
+    el.className = 'node-label ' + (s.up?'up':'down');
+    el.style.left = s.x+'px'; el.style.top = (s.y + 52)+'px';
+    el.innerHTML = `<div class="nm">${s.name}</div><div class="st">${s.up?'● SEHAT':'✕ DOWN'}</div><div class="cnt">${s.req} req</div>`;
+    el.dataset.sid = s.id;
+    stage.appendChild(el); labelEls.push(el);
+  });
+  // client label
+  const cEl = document.createElement('div');
+  cEl.className='node-label'; cEl.style.left = (W/2)+'px'; cEl.style.top = '8px';
+  cEl.innerHTML = `<div class="nm" style="font-size:11px;color:#6b7288;letter-spacing:2px">CLIENTS</div>`;
+  stage.appendChild(cEl); labelEls.push(cEl);
+}
+function refreshLabels(){
+  labelEls.forEach(el=>{
+    if(el.dataset.sid===undefined) return;
+    const s = servers[+el.dataset.sid];
+    el.className = 'node-label ' + (s.up?'up':'down');
+    el.querySelector('.st').textContent = s.up ? '● SEHAT' : '✕ DOWN';
+    el.querySelector('.cnt').textContent = s.req + ' req';
+  });
+  document.getElementById('totalReq').textContent = totalReq;
+}
+
+// tap server untuk toggle
+cv.addEventListener('pointerdown', e=>{
+  const r = cv.getBoundingClientRect(), mx = e.clientX-r.left, my = e.clientY-r.top;
+  servers.forEach(s=>{
+    if(Math.abs(mx-s.x)<70 && Math.abs(my-s.y)<60){
+      s.up = !s.up; s.flash = 1; refreshLabels();
+    }
+  });
+});
+
+// ---- packet ----
+function healthyServers(){ return servers.filter(s=>s.up); }
+function spawnPacket(){
+  const c = clients[(Math.random()*clients.length)|0];
+  const hs = healthyServers();
+  if(!hs.length) return;
+  const target = hs[rrIndex % hs.length]; rrIndex++;
+  packets.push({ x:c.x, y:c.y+26, t:0, dur: 1.1, c1:c, mid:{x:lb.x,y:lb.y}, target, hue: 32+Math.random()*14 });
+}
+function bez(p0,p1,p2,t){ const u=1-t; return { x:u*u*p0.x+2*u*t*p1.x+t*t*p2.x, y:u*u*p0.y+2*u*t*p1.y+t*t*p2.y }; }
+
+// ---- draw ----
+function drawServer(s){
+  const w=110,h=84, x=s.x-w/2, y=s.y-h/2;
+  const col = s.up ? '#00ffa3' : '#ff5252';
+  ctx.save();
+  ctx.shadowColor = col; ctx.shadowBlur = 18 + s.flash*30;
+  ctx.strokeStyle = col; ctx.lineWidth = 2.5;
+  roundRect(x,y,w,h,10); ctx.stroke();
+  ctx.shadowBlur = 0;
+  // rak
+  for(let i=0;i<3;i++){
+    const ry = y+12+i*22;
+    ctx.strokeStyle = s.up?'rgba(0,255,163,.5)':'rgba(255,82,82,.4)';
+    ctx.lineWidth = 1.5;
+    roundRect(x+10,ry,w-20,16,4); ctx.stroke();
+    if(s.up){ ctx.fillStyle='#00ffa3'; ctx.beginPath(); ctx.arc(x+20,ry+8,3,0,7); ctx.fill(); }
+  }
+  if(!s.up){ // X besar
+    ctx.strokeStyle='#ff5252'; ctx.lineWidth=6; ctx.lineCap='round';
+    ctx.shadowColor='#ff5252'; ctx.shadowBlur=16;
+    const cxp=s.x, cyp=s.y;
+    ctx.beginPath(); ctx.moveTo(cxp-18,cyp-18); ctx.lineTo(cxp+18,cyp+18);
+    ctx.moveTo(cxp+18,cyp-18); ctx.lineTo(cxp-18,cyp+18); ctx.stroke();
+  }
+  // health bar
+  const bw=70;
+  ctx.fillStyle='rgba(255,255,255,.08)'; ctx.fillRect(s.x-bw/2, y+h+6, bw, 6);
+  if(s.up){ const f = Math.min(1, s.req/40);
+    ctx.fillStyle='#00ffa3'; ctx.shadowColor='#00ffa3'; ctx.shadowBlur=8;
+    ctx.fillRect(s.x-bw/2, y+h+6, bw*Math.max(.15,f), 6);
+  }
+  ctx.restore();
+  if(s.flash>0) s.flash=Math.max(0,s.flash-0.05);
+}
+function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+function drawLB(){
+  const {x,y,w,h} = lb;
+  ctx.save();
+  const g = ctx.createLinearGradient(x-w/2,y,x+w/2,y);
+  g.addColorStop(0,'#1a1a2e'); g.addColorStop(.5,'#23233d'); g.addColorStop(1,'#1a1a2e');
+  ctx.fillStyle=g;
+  ctx.shadowColor='#00e5ff'; ctx.shadowBlur=22;
+  ctx.strokeStyle='rgba(0,229,255,.7)'; ctx.lineWidth=2;
+  roundRect(x-w/2,y-h/2,w,h,12); ctx.fill(); ctx.stroke();
+  ctx.shadowBlur=0;
+  // lampu indikator
+  for(let i=0;i<6;i++){
+    const on = healthyServers().length > (i%3);
+    ctx.fillStyle = on ? '#00ffa3' : '#333';
+    ctx.shadowColor = on?'#00ffa3':'transparent'; ctx.shadowBlur = on?8:0;
+    ctx.beginPath(); ctx.arc(x+w/2-24-(i%3)*14, y-12+Math.floor(i/3)*24, 4, 0, 7); ctx.fill();
+  }
+  ctx.shadowBlur=0;
+  // simbol
+  ctx.strokeStyle='#00e5ff'; ctx.lineWidth=2.5; ctx.lineCap='round';
+  ctx.beginPath(); ctx.arc(x-w/2+34, y, 10, 0, 7); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x-w/2+44,y); ctx.lineTo(x-w/2+70,y);
+  ctx.moveTo(x-w/2+58,y-8); ctx.lineTo(x-w/2+70,y); ctx.lineTo(x-w/2+58,y+8); ctx.stroke();
+  ctx.restore();
+}
+function drawClient(c){
+  ctx.save();
+  ctx.font='40px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowColor='#00e5ff'; ctx.shadowBlur=14;
+  ctx.fillText(c.icon, c.x, c.y);
+  ctx.restore();
+}
+function drawWire(a,b,color,width,dashed){
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=width; ctx.globalAlpha=.35;
+  ctx.shadowColor=color; ctx.shadowBlur=6;
+  if(dashed) ctx.setLineDash([8,8]);
+  ctx.beginPath(); ctx.moveTo(a.x,a.y);
+  ctx.quadraticCurveTo(a.x,(a.y+b.y)/2, b.x,b.y); ctx.stroke();
+  ctx.restore();
+}
+
+// ---- loop ----
+let last = performance.now();
+function frame(now){
+  const dt = Math.min(.05,(now-last)/1000); last = now;
+  ctx.clearRect(0,0,W,H);
+  // bg grid halus
+  ctx.save(); ctx.strokeStyle='rgba(255,255,255,.025)'; ctx.lineWidth=1;
+  for(let gx=0;gx<W;gx+=44){ ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke(); }
+  for(let gy=0;gy<H;gy+=44){ ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke(); }
+  ctx.restore();
+
+  const spd = paused?0:speedMul;
+  // wires
+  clients.forEach(c=> drawWire({x:c.x,y:c.y+26},{x:lb.x,y:lb.y-lb.h/2},'#ff9f1c',2,false));
+  servers.forEach(s=>{
+    const col = s.up ? '#00ffa3' : '#ff5252';
+    drawWire({x:lb.x,y:lb.y+lb.h/2},{x:s.x,y:s.y-44},col,2.5,!s.up);
+  });
+  // spawn
+  if(!paused){
+    spawnTimer -= dt*spd;
+    if(spawnTimer<=0){ spawnPacket(); spawnTimer = .5; }
+  }
+  // update & draw packets
+  for(let i=packets.length-1;i>=0;i--){
+    const p = packets[i];
+    if(!paused) p.t += dt*spd/p.dur;
+    const half = .5;
+    let pos;
+    if(p.t<half){ pos = bez({x:p.c1.x,y:p.c1.y+26},{x:(p.c1.x+lb.x)/2,y:Math.min(p.c1.y,lb.y)-30},{x:lb.x,y:lb.y}, p.t/half); }
+    else { const t2=(p.t-half)/half;
+      const tgt = p.target.up ? p.target : healthyServers()[0];
+      if(!tgt){ packets.splice(i,1); continue; }
+      pos = bez({x:lb.x,y:lb.y},{x:(lb.x+tgt.x)/2,y:(lb.y+tgt.y)/2+20},{x:tgt.x,y:tgt.y-44}, Math.min(1,t2));
+    }
+    // glow dot
+    const r = 5;
+    const gr = ctx.createRadialGradient(pos.x,pos.y,0,pos.x,pos.y,r*3);
+    gr.addColorStop(0,'rgba(255,200,80,1)'); gr.addColorStop(.4,'rgba(255,160,40,.7)'); gr.addColorStop(1,'rgba(255,140,0,0)');
+    ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(pos.x,pos.y,r*3,0,7); ctx.fill();
+    ctx.fillStyle='#fff7e0'; ctx.beginPath(); ctx.arc(pos.x,pos.y,r*.55,0,7); ctx.fill();
+    if(p.t>=1){
+      const tgt = p.target.up?p.target:healthyServers()[0];
+      if(tgt){ tgt.req++; tgt.flash=.6; totalReq++; refreshLabels(); }
+      packets.splice(i,1);
+    }
+  }
+  drawLB();
+  clients.forEach(drawClient);
+  servers.forEach(drawServer);
+  requestAnimationFrame(frame);
+}
+
+// controls
+document.getElementById('btnPause').onclick = e=>{ paused=!paused; e.target.textContent = paused?'▶ Jalan':'⏸ Jeda'; };
+document.getElementById('btnReset').onclick = ()=>{
+  servers.forEach((s,i)=>{ s.req=0; s.up = i!==1; }); totalReq=0; rrIndex=0; packets.length=0; refreshLabels();
+};
+document.getElementById('speed').oninput = e=>{ speedMul = +e.target.value/2; };
+
+resize(); refreshLabels(); requestAnimationFrame(frame);
+</script>
+</body>
+</html>
