@@ -134,10 +134,13 @@ footer .nm{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--sag
   </div>
   <div class="card">
     <h3>Akad Nikah & Resepsi</h3>
-    <div class="dt">Selasa, 27 Juli 2027</div>
+    <div class="dt">Rabu, 11 November 2026</div>
     <div class="tm">Pukul 10.00 WIB — selesai</div>
     <div class="loc">Masjid Sabilillah<br>Jl. Jend. A. Yani No. 15, Blimbing,<br>Kota Malang, Jawa Timur</div>
-    <a class="btn-o" href="https://www.google.com/maps/search/?api=1&query=Masjid+Sabilillah+Jl.+Jend.+A.+Yani+No.+15+Malang" target="_blank">📍 Lihat Google Maps</a>
+    <div style="margin-top:14px;border-radius:14px;overflow:hidden;border:1px solid var(--gold-l)">
+      <iframe src="https://www.google.com/maps?q=Masjid+Sabilillah,+Jl.+Jend.+A.+Yani+No.+15,+Blimbing,+Malang&output=embed" width="100%" height="260" style="border:0" loading="lazy" title="Lokasi Masjid Sabilillah"></iframe>
+    </div>
+    <a class="btn-o" href="https://www.google.com/maps/search/?api=1&query=Masjid+Sabilillah+Jl.+Jend.+A.+Yani+No.+15+Malang" target="_blank">📍 Buka di Google Maps</a>
   </div>
 </section>
 
@@ -164,10 +167,10 @@ footer .nm{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--sag
   <div class="divider">✦</div>
   <p style="color:var(--mut);font-size:14px;margin-bottom:8px">Doa restu Anda adalah hadiah terindah. Namun jika berkenan memberi tanda kasih:</p>
   <div class="gift-box">
-    <div class="bank">💳 Bank — <span style="color:var(--mut);font-size:13px">(segera diisi)</span></div>
-    <div class="rek">•••• •••• ••••</div>
-    <div style="font-size:13px;color:var(--mut)">a.n. Fauzan & Fewia</div>
-    <button class="copybtn" style="margin-top:10px" onclick="toast('Nomor rekening belum diisi')">Salin Nomor</button>
+    <div class="bank">💳 SeaBank</div>
+    <div class="rek" id="rekNum">9016 2369 6453</div>
+    <div style="font-size:13px;color:var(--mut)">a.n. Rahmy Fauzanibudi Ahmad</div>
+    <button class="copybtn" style="margin-top:10px" onclick="copyRek()">Salin Nomor</button>
   </div>
 </section>
 
@@ -189,13 +192,15 @@ footer .nm{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--sag
 
 <footer>
   <div class="nm">F & F</div>
-  <div style="margin-top:8px">27 . 07 . 2027</div>
+  <div style="margin-top:8px">11 . 11 . 2026</div>
 </footer>
 
 <div id="toast"></div>
 
 <script>
-const WEDDING = new Date('2027-07-27T10:00:00+07:00').getTime();
+const WEDDING = new Date('2026-11-11T10:00:00+07:00').getTime();
+/* ISI URL WEB APP GOOGLE SHEETS DI SINI (lihat panduan di chat) */
+const SHEETS_URL = "";
 /* guest name from ?to= */
 (function(){
   const p = new URLSearchParams(location.search).get('to');
@@ -220,6 +225,11 @@ function tick(){
   document.getElementById('cd-s').textContent = Math.floor(d/1e3)%60;
 }
 setInterval(tick,1000); tick();
+function copyRek(){
+  const n = document.getElementById('rekNum').textContent.replace(/\s/g,'');
+  if(navigator.clipboard) navigator.clipboard.writeText(n).then(()=>toast('Nomor tersalin ✓'));
+  else toast(n);
+}
 /* toast */
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 /* rsvp + wishes (localStorage) */
@@ -235,11 +245,18 @@ function sendRSVP(){
   const name=document.getElementById('r_name').value.trim();
   const msg=document.getElementById('r_msg').value.trim();
   if(!name) return toast('Isi nama dulu ya');
-  const w=getW();
-  w.push({name, attend:document.getElementById('r_attend').value,
-    guests:document.getElementById('r_guests').value, msg:msg||'—',
-    date:new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})});
+  const attend=document.getElementById('r_attend').value;
+  const guests=document.getElementById('r_guests').value;
+  const entry={name, attend, guests, msg:msg||'—',
+    date:new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})};
+  const w=getW(); w.push(entry);
   localStorage.setItem(KEY,JSON.stringify(w));
+  /* kirim ke Google Sheets (kalau sudah disetting) */
+  if(SHEETS_URL){
+    fetch(SHEETS_URL,{method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:new URLSearchParams({name, status:attend, guests, message:entry.msg})});
+  }
   document.getElementById('r_name').value=''; document.getElementById('r_msg').value='';
   renderW(); toast('Terima kasih atas doanya 🤲');
 }
