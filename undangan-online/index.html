@@ -195,6 +195,12 @@ footer .nm{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--sag
   <div style="margin-top:8px">11 . 11 . 2026</div>
 </footer>
 
+<!-- MUSIC -->
+<audio id="bgm" loop preload="none">
+  <source src="https://archive.org/download/soundcloud-507771855/Wedding_Film_-_No_Copyright_Romantic_and_Inspirational_Background_Music_For_YouTube_Videos-507771855.mp3" type="audio/mpeg">
+</audio>
+<button id="musicBtn" onclick="toggleMusic()" style="position:fixed;bottom:20px;right:20px;z-index:90;width:48px;height:48px;border-radius:50%;background:var(--sage);color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(95,115,85,.4);display:none">🎵</button>
+
 <div id="toast"></div>
 
 <script>
@@ -211,6 +217,16 @@ function openInv(){
   document.getElementById('cover').classList.add('hide');
   document.body.style.overflow='';
   document.querySelectorAll('section').forEach(s=>observer.observe(s));
+  /* start music */
+  const bgm=document.getElementById('bgm');
+  bgm.play().then(()=>{ document.getElementById('musicBtn').style.display='block'; }).catch(()=>{});
+}
+/* music toggle */
+let playing=false;
+function toggleMusic(){
+  const bgm=document.getElementById('bgm'), btn=document.getElementById('musicBtn');
+  if(bgm.paused){ bgm.play(); btn.textContent='🎵'; }
+  else{ bgm.pause(); btn.textContent='🔇'; }
 }
 document.body.style.overflow='hidden';
 /* reveal on scroll */
