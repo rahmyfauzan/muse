@@ -28,17 +28,17 @@ button.gen:active{transform:scale(.98)}
 button.small{background:transparent;border:1px solid var(--neon);color:var(--neon);border-radius:8px;padding:8px 14px;font-size:.85rem;cursor:pointer}
 button.small:hover{background:rgba(0,240,255,.12)}
 button.small:disabled{opacity:.4;cursor:default}
-ul{list-style:none;display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;padding-right:2px}
+ul{list-style:none;display:flex;flex-direction:column;gap:8px;max-height:480px;overflow:auto;padding-right:2px}
 li{display:flex;align-items:center;gap:10px;background:#070d1a;border:1px solid rgba(0,240,255,.12);border-radius:10px;padding:9px 12px;animation:fadein .35s both;animation-delay:calc(var(--i)*28ms)}
 @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.num{color:var(--muted);font-size:.8rem;min-width:30px}
+.num{color:var(--muted);font-size:.8rem;min-width:34px}
 .name{font-family:ui-monospace,Consolas,monospace;flex:1;overflow:hidden;text-overflow:ellipsis;font-size:.92rem}
 a.cek{color:var(--pink);text-decoration:none;font-size:.8rem;border:1px solid rgba(255,47,179,.4);padding:5px 10px;border-radius:8px;white-space:nowrap}
 a.cek:hover{background:rgba(255,47,179,.12)}
 .empty{text-align:center;color:var(--muted);padding:24px 0;font-size:.9rem;line-height:1.7}
 .foot{text-align:center;color:var(--muted);font-size:.8rem;margin-top:8px;line-height:1.7}
 .err{color:#ff7b7b;font-size:.85rem;margin-top:10px;display:none}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0d1526;border:1px solid var(--neon);color:var(--text);padding:10px 20px;border-radius:10px;font-size:.85rem;opacity:0;transition:all .3s;pointer-events:none}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0d1526;border:1px solid var(--neon);color:var(--text);padding:10px 20px;border-radius:10px;font-size:.85rem;opacity:0;transition:all .3s;pointer-events:none;z-index:10}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
@@ -48,15 +48,15 @@ a.cek:hover{background:rgba(255,47,179,.12)}
   <p class="sub">Generate kandidat username, salin, kirim ke Muse buat dicek ketersediaannya</p>
 
   <div class="card">
-    <label>Kata dasar</label>
+    <label>Kata dasar <span class="hint">— boleh kosong</span></label>
     <input id="base" placeholder="mis. fauzan" autocomplete="off"/>
     <label>Prefix <span class="hint">— pisahkan dengan koma, boleh kosong</span></label>
     <input id="prefix" placeholder="mis. the, real, x" autocomplete="off"/>
     <label>Suffix <span class="hint">— pisahkan dengan koma, boleh kosong</span></label>
     <input id="suffix" placeholder="mis. id, official" autocomplete="off"/>
     <div class="row">
-      <div><label>Jumlah digit acak</label><input id="digits" type="number" min="0" max="6" value="2"/></div>
-      <div><label>Jumlah hasil</label><input id="total" type="number" min="1" max="200" value="20"/></div>
+      <div><label>Panjang karakter acak <span class="hint">— huruf+angka</span></label><input id="digits" type="number" min="0" max="8" value="3"/></div>
+      <div><label>Jumlah hasil <span class="hint">— maks 1000</span></label><input id="total" type="number" min="1" max="1000" value="50"/></div>
     </div>
     <div class="err" id="err"></div>
     <button class="gen" onclick="doGenerate()">✨ Generate</button>
@@ -77,6 +77,8 @@ a.cek:hover{background:rgba(255,47,179,.12)}
 
 <script>
 let results = [];
+const ALPHANUM='abcdefghijklmnopqrstuvwxyz0123456789';
+const LETTERS='abcdefghijklmnopqrstuvwxyz';
 
 function sanitize(s){
   return s.toLowerCase().trim().replace(/[^a-z0-9._]/g,'').replace(/\.{2,}/g,'.');
@@ -84,9 +86,15 @@ function sanitize(s){
 function valid(u){
   return u.length>=1 && u.length<=30 && !u.startsWith('.') && !u.endsWith('.');
 }
-function randDigits(n){
+// Karakter acak: huruf+angka, panjang TEPAT n, dijamin ada hurufnya (tidak hanya angka)
+function randStr(n){
+  if(n<=0) return '';
   let s='';
-  for(let i=0;i<n;i++) s+=Math.floor(Math.random()*10);
+  for(let i=0;i<n;i++) s+=ALPHANUM[Math.floor(Math.random()*ALPHANUM.length)];
+  if(/^[0-9]+$/.test(s)){
+    const pos=Math.floor(Math.random()*n);
+    s=s.slice(0,pos)+LETTERS[Math.floor(Math.random()*26)]+s.slice(pos+1);
+  }
   return s;
 }
 function shuffle(a){
@@ -105,38 +113,58 @@ function toast(msg){
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),1800);
 }
+function joinParts(p,b,s,sep){
+  const arr=[];
+  if(p) arr.push(p);
+  if(b) arr.push(b);
+  if(s) arr.push(s);
+  return arr.join(sep);
+}
 
 function doGenerate(){
   showErr('');
   const base=sanitize(document.getElementById('base').value);
-  if(!base){ showErr('Isi dulu kata dasarnya.'); return; }
   const prefs=csv('prefix'), sufs=csv('suffix');
-  const digitCount=Math.max(0,Math.min(6,parseInt(document.getElementById('digits').value)||0));
-  const total=Math.max(1,Math.min(200,parseInt(document.getElementById('total').value)||20));
+  const randLen=Math.max(0,Math.min(8,parseInt(document.getElementById('digits').value)||0));
+  const total=Math.max(1,Math.min(1000,parseInt(document.getElementById('total').value)||50));
+  if(!base&&!prefs.length&&!sufs.length&&randLen===0){
+    showErr('Isi minimal satu: kata dasar, prefix, suffix, atau panjang karakter acak lebih dari 0.');
+    return;
+  }
   const seps=['','.','_'];
   const out=new Set();
   const push=u=>{ u=sanitize(u); if(valid(u)) out.add(u); };
 
-  // Kombinasi sistematis: prefix + base + suffix dengan variasi pemisah
-  const P=[''].concat(prefs), S=[''].concat(sufs);
-  outer:
-  for(const p of P) for(const s of S) for(const sep of seps){
-    if(out.size>=total) break outer;
-    if(!p && !s) { if(sep==='' ) push(base); continue; }
-    let u=(p?p+sep:'')+base+(s?sep+s:'');
-    push(u);
-    if(digitCount>0 && out.size<total) push(u+randDigits(digitCount));
+  // Inti: semua kombinasi prefix + kata dasar + suffix
+  const cores=new Set();
+  const P=[''].concat(prefs), B=base?[base]:[''], S=[''].concat(sufs);
+  for(const p of P) for(const b of B) for(const s of S) for(const sep of seps){
+    if(!p&&!b&&!s) continue;
+    const core=joinParts(p,b,s,sep);
+    if(core) cores.add(core);
   }
-  // Isi sisa dengan variasi acak digit
-  let guard=0;
-  while(out.size<total && guard<total*60){
-    guard++;
-    const p=prefs.length&&Math.random()<0.5?prefs[Math.floor(Math.random()*prefs.length)]:'';
-    const s=sufs.length&&Math.random()<0.5?sufs[Math.floor(Math.random()*sufs.length)]:'';
-    const sep=seps[Math.floor(Math.random()*seps.length)];
-    let u=(p?p+sep:'')+base+(s?sep+s:'');
-    const d=digitCount>0?randDigits(digitCount):randDigits(1+Math.floor(Math.random()*3));
-    push(u+(Math.random()<0.6?d:sep+d));
+  const coreArr=[...cores];
+
+  // Setiap hasil WAJIB memuat tepat randLen karakter acak (kecuali randLen=0)
+  if(randLen===0){
+    for(const c of coreArr){ if(out.size>=total) break; push(c); }
+  }else{
+    for(const core of coreArr){
+      if(out.size>=total) break;
+      for(const sep of seps){
+        if(out.size>=total) break;
+        push(core ? core+sep+randStr(randLen) : randStr(randLen));
+      }
+    }
+    // Isi sisa dengan variasi acak sampai kuota terpenuhi (karakter acak selalu di akhir)
+    let guard=0;
+    while(out.size<total && guard<total*80){
+      guard++;
+      const core=coreArr.length?coreArr[Math.floor(Math.random()*coreArr.length)]:'';
+      const r=randStr(randLen);
+      const sep=seps[Math.floor(Math.random()*seps.length)];
+      push(core ? core+sep+r : r);
+    }
   }
 
   results=shuffle([...out]).slice(0,total);
@@ -153,7 +181,7 @@ function render(){
     return;
   }
   ul.innerHTML=results.map((u,i)=>
-    '<li style="--i:'+i+'"><span class="num">'+(i+1)+'</span>'+
+    '<li style="--i:'+Math.min(i,40)+'"><span class="num">'+(i+1)+'</span>'+
     '<span class="name">'+u+'</span>'+
     '<a class="cek" href="https://www.instagram.com/'+u+'/" target="_blank" rel="noopener">Cek ↗</a></li>'
   ).join('');
