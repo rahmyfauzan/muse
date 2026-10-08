@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>IG Username Generator</title>
+<style>
+:root{--bg:#070b14;--card:#0d1526;--neon:#00f0ff;--pink:#ff2fb3;--text:#e8f4ff;--muted:#8b9bb8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(1200px 600px at 50% -10%,#12203d 0%,var(--bg) 60%);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:24px 16px}
+.wrap{max-width:640px;margin:0 auto}
+h1{font-size:1.7rem;text-align:center;background:linear-gradient(90deg,var(--neon),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:4px}
+.sub{text-align:center;color:var(--muted);margin-bottom:24px;font-size:.9rem}
+.card{background:rgba(13,21,38,.88);border:1px solid rgba(0,240,255,.18);border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 0 24px rgba(0,240,255,.06)}
+label{display:block;font-size:.8rem;color:var(--muted);margin:12px 0 6px}
+.card>label:first-of-type{margin-top:0}
+input{width:100%;background:#070d1a;border:1px solid rgba(0,240,255,.25);border-radius:10px;color:var(--text);padding:10px 12px;font-size:.95rem;outline:none}
+input:focus{border-color:var(--neon);box-shadow:0 0 10px rgba(0,240,255,.25)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-weight:400;opacity:.75}
+button.gen{width:100%;margin-top:16px;padding:13px;border:none;border-radius:12px;font-size:1rem;font-weight:700;color:#04121a;background:linear-gradient(90deg,var(--neon),var(--pink));cursor:pointer;transition:transform .15s;animation:pulse 2.4s infinite}
+button.gen:hover{transform:translateY(-2px)}
+button.gen:active{transform:scale(.98)}
+@keyframes pulse{0%,100%{box-shadow:0 0 12px rgba(0,240,255,.35)}50%{box-shadow:0 0 26px rgba(255,47,179,.45)}}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.count{font-size:.85rem;color:var(--muted)}
+.spacer{flex:1}
+button.small{background:transparent;border:1px solid var(--neon);color:var(--neon);border-radius:8px;padding:8px 14px;font-size:.85rem;cursor:pointer}
+button.small:hover{background:rgba(0,240,255,.12)}
+button.small:disabled{opacity:.4;cursor:default}
+ul{list-style:none;display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;padding-right:2px}
+li{display:flex;align-items:center;gap:10px;background:#070d1a;border:1px solid rgba(0,240,255,.12);border-radius:10px;padding:9px 12px;animation:fadein .35s both;animation-delay:calc(var(--i)*28ms)}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.num{color:var(--muted);font-size:.8rem;min-width:30px}
+.name{font-family:ui-monospace,Consolas,monospace;flex:1;overflow:hidden;text-overflow:ellipsis;font-size:.92rem}
+a.cek{color:var(--pink);text-decoration:none;font-size:.8rem;border:1px solid rgba(255,47,179,.4);padding:5px 10px;border-radius:8px;white-space:nowrap}
+a.cek:hover{background:rgba(255,47,179,.12)}
+.empty{text-align:center;color:var(--muted);padding:24px 0;font-size:.9rem;line-height:1.7}
+.foot{text-align:center;color:var(--muted);font-size:.8rem;margin-top:8px;line-height:1.7}
+.err{color:#ff7b7b;font-size:.85rem;margin-top:10px;display:none}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0d1526;border:1px solid var(--neon);color:var(--text);padding:10px 20px;border-radius:10px;font-size:.85rem;opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚡ IG Username Generator</h1>
+  <p class="sub">Generate kandidat username, salin, kirim ke Muse buat dicek ketersediaannya</p>
+
+  <div class="card">
+    <label>Kata dasar</label>
+    <input id="base" placeholder="mis. fauzan" autocomplete="off"/>
+    <label>Prefix <span class="hint">— pisahkan dengan koma, boleh kosong</span></label>
+    <input id="prefix" placeholder="mis. the, real, x" autocomplete="off"/>
+    <label>Suffix <span class="hint">— pisahkan dengan koma, boleh kosong</span></label>
+    <input id="suffix" placeholder="mis. id, official" autocomplete="off"/>
+    <div class="row">
+      <div><label>Jumlah digit acak</label><input id="digits" type="number" min="0" max="6" value="2"/></div>
+      <div><label>Jumlah hasil</label><input id="total" type="number" min="1" max="200" value="20"/></div>
+    </div>
+    <div class="err" id="err"></div>
+    <button class="gen" onclick="doGenerate()">✨ Generate</button>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <span class="count" id="count">Belum ada hasil</span>
+      <span class="spacer"></span>
+      <button class="small" id="copyBtn" onclick="copyAll()" disabled>📋 Salin Semua</button>
+    </div>
+    <ul id="list"><div class="empty">Hasil generate muncul di sini.<br/>Tiap baris ada tombol Cek buat buka profilnya di Instagram.</div></ul>
+  </div>
+
+  <p class="foot">💡 Salin daftarnya → kirim ke chat Muse → aku cekin satu-satu pakai browser.<br/>Hasil generate selalu unik, nggak ada yang kembar.</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let results = [];
+
+function sanitize(s){
+  return s.toLowerCase().trim().replace(/[^a-z0-9._]/g,'').replace(/\.{2,}/g,'.');
+}
+function valid(u){
+  return u.length>=1 && u.length<=30 && !u.startsWith('.') && !u.endsWith('.');
+}
+function randDigits(n){
+  let s='';
+  for(let i=0;i<n;i++) s+=Math.floor(Math.random()*10);
+  return s;
+}
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function csv(id){
+  return document.getElementById(id).value.split(',').map(sanitize).filter(Boolean);
+}
+function showErr(msg){
+  const e=document.getElementById('err');
+  e.textContent=msg; e.style.display=msg?'block':'none';
+}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+function doGenerate(){
+  showErr('');
+  const base=sanitize(document.getElementById('base').value);
+  if(!base){ showErr('Isi dulu kata dasarnya.'); return; }
+  const prefs=csv('prefix'), sufs=csv('suffix');
+  const digitCount=Math.max(0,Math.min(6,parseInt(document.getElementById('digits').value)||0));
+  const total=Math.max(1,Math.min(200,parseInt(document.getElementById('total').value)||20));
+  const seps=['','.','_'];
+  const out=new Set();
+  const push=u=>{ u=sanitize(u); if(valid(u)) out.add(u); };
+
+  // Kombinasi sistematis: prefix + base + suffix dengan variasi pemisah
+  const P=[''].concat(prefs), S=[''].concat(sufs);
+  outer:
+  for(const p of P) for(const s of S) for(const sep of seps){
+    if(out.size>=total) break outer;
+    if(!p && !s) { if(sep==='' ) push(base); continue; }
+    let u=(p?p+sep:'')+base+(s?sep+s:'');
+    push(u);
+    if(digitCount>0 && out.size<total) push(u+randDigits(digitCount));
+  }
+  // Isi sisa dengan variasi acak digit
+  let guard=0;
+  while(out.size<total && guard<total*60){
+    guard++;
+    const p=prefs.length&&Math.random()<0.5?prefs[Math.floor(Math.random()*prefs.length)]:'';
+    const s=sufs.length&&Math.random()<0.5?sufs[Math.floor(Math.random()*sufs.length)]:'';
+    const sep=seps[Math.floor(Math.random()*seps.length)];
+    let u=(p?p+sep:'')+base+(s?sep+s:'');
+    const d=digitCount>0?randDigits(digitCount):randDigits(1+Math.floor(Math.random()*3));
+    push(u+(Math.random()<0.6?d:sep+d));
+  }
+
+  results=shuffle([...out]).slice(0,total);
+  render();
+  toast(results.length+' username dibuat');
+}
+
+function render(){
+  const ul=document.getElementById('list');
+  document.getElementById('count').textContent=results.length?results.length+' username (semua unik)':'Belum ada hasil';
+  document.getElementById('copyBtn').disabled=!results.length;
+  if(!results.length){
+    ul.innerHTML='<div class="empty">Hasil generate muncul di sini.<br/>Tiap baris ada tombol Cek buat buka profilnya di Instagram.</div>';
+    return;
+  }
+  ul.innerHTML=results.map((u,i)=>
+    '<li style="--i:'+i+'"><span class="num">'+(i+1)+'</span>'+
+    '<span class="name">'+u+'</span>'+
+    '<a class="cek" href="https://www.instagram.com/'+u+'/" target="_blank" rel="noopener">Cek ↗</a></li>'
+  ).join('');
+}
+
+function copyAll(){
+  if(!results.length) return;
+  const txt=results.join('\n');
+  const done=()=>toast('Disalin! Kirim ke chat Muse ya');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(()=>fallbackCopy(txt,done));
+  }else fallbackCopy(txt,done);
+}
+function fallbackCopy(txt,done){
+  const ta=document.createElement('textarea');
+  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ toast('Gagal menyalin'); }
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
