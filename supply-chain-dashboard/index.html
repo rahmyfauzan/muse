@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Supply Chain Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --amber:#f5a800; --amber-dark:#d98e00; --amber-soft:#fef3d8;
+  --bg:#fbf7ec; --card:#ffffff; --ink:#2b2113; --muted:#8a7a5c;
+  --line:#f0e6cf; --green:#16a34a; --red:#dc2626; --slate:#64748b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+.app{display:flex;min-height:100vh}
+/* ---------- Sidebar ---------- */
+.sidebar{width:230px;flex-shrink:0;background:linear-gradient(180deg,#ffc21c 0%,#f5a800 55%,#e09500 100%);color:#3a2a05;display:flex;flex-direction:column;padding:20px 14px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px;font-weight:800;font-size:1.02rem}
+.brand .logo{width:36px;height:36px;border-radius:10px;background:#3a2a05;color:#ffc21c;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:#4a3607;text-decoration:none;font-weight:500;font-size:.88rem;transition:background .15s}
+.nav a:hover{background:rgba(255,255,255,.28)}
+.nav a.active{background:#3a2a05;color:#ffd968;font-weight:600}
+.nav a .ic{width:20px;text-align:center}
+.promo{margin-top:auto;background:rgba(58,42,5,.92);border-radius:14px;padding:16px;color:#ffe9ad;font-size:.82rem;line-height:1.55}
+.promo b{color:#fff;display:block;margin-bottom:6px;font-size:.88rem}
+.promo .truck{font-size:1.6rem;margin-bottom:8px;display:block}
+/* ---------- Main ---------- */
+.main{flex:1;padding:22px 26px;min-width:0}
+.topbar{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.topbar h1{font-size:1.45rem;font-weight:800}
+.topbar h1 .hl{color:var(--amber-dark)}
+.topbar p{color:var(--muted);font-size:.83rem;margin-top:4px;max-width:520px}
+.filters{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.fld select{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:.82rem;font-family:inherit;color:var(--ink);min-width:130px}
+.btn{background:linear-gradient(90deg,#f5a800,#e09500);border:none;color:#3a2a05;font-weight:700;border-radius:10px;padding:10px 18px;font-size:.85rem;cursor:pointer;box-shadow:0 4px 14px rgba(245,168,0,.35);align-self:flex-end}
+.btn:hover{transform:translateY(-1px)}
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;gap:11px;align-items:center;box-shadow:0 2px 8px rgba(120,85,0,.05)}
+.kpi .ic{width:40px;height:40px;flex-shrink:0;border-radius:50%;background:var(--amber-soft);display:flex;align-items:center;justify-content:center;font-size:1.15rem}
+.kpi .lb{font-size:.7rem;color:var(--muted);font-weight:600}
+.kpi .vl{font-size:1.12rem;font-weight:800;margin:1px 0}
+.kpi .dl{font-size:.68rem;color:var(--green);font-weight:600}
+/* Layout */
+.content{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 2px 8px rgba(120,85,0,.05)}
+.card.wide{grid-column:1/-1}
+.card h3{font-size:.92rem;font-weight:700;margin-bottom:2px}
+.card .note{font-size:.74rem;color:var(--muted);margin-top:10px;line-height:1.5;border-top:1px dashed var(--line);padding-top:8px}
+.chart-box{position:relative;height:230px;margin-top:8px}
+.chart-box.sm{height:200px}
+/* Tables */
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.78rem}
+th{text-align:left;color:var(--muted);font-weight:600;font-size:.68rem;text-transform:uppercase;letter-spacing:.03em;padding:7px 6px;border-bottom:1px solid var(--line)}
+td{padding:8px 6px;border-bottom:1px solid #faf3e2}
+tr:last-child td{border-bottom:none}
+.bar{height:6px;border-radius:4px;background:#f3ead3;margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#ffc21c,#e09500)}
+.up{color:var(--green);font-weight:600}
+/* Shipping bars */
+.ship{display:flex;flex-direction:column;gap:11px;margin-top:10px}
+.ship .row{display:grid;grid-template-columns:150px 1fr 46px;gap:10px;align-items:center;font-size:.78rem}
+.ship .pct{text-align:right;font-weight:700}
+/* Right rail */
+.rail{display:flex;flex-direction:column;gap:16px}
+.alert{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #faf3e2;font-size:.78rem}
+.alert:last-child{border-bottom:none}
+.alert .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.alert b{display:block;font-size:.8rem;margin-bottom:2px}
+.alert p{color:var(--muted);line-height:1.5}
+.insight{display:flex;gap:9px;font-size:.78rem;padding:8px 0;color:#5c4d33;line-height:1.5}
+.insight .ck{color:var(--green);font-weight:800;flex-shrink:0}
+@media(max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}.content{grid-template-columns:1fr}}
+@media(max-width:760px){.sidebar{display:none}.cards{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.main{padding:16px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">📦</span> SupplyChain</div>
+    <nav class="nav">
+      <a href="#" class="active"><span class="ic">🏠</span> Overview</a>
+      <a href="#"><span class="ic">📋</span> Inventory</a>
+      <a href="#"><span class="ic">🛒</span> Procurement</a>
+      <a href="#"><span class="ic">🤝</span> Supplier Performance</a>
+      <a href="#"><span class="ic">🚚</span> Logistics &amp; Shipping</a>
+      <a href="#"><span class="ic">✅</span> Order Fulfillment</a>
+      <a href="#"><span class="ic">💰</span> Cost Analysis</a>
+      <a href="#"><span class="ic">⚠️</span> Discrepancies</a>
+      <a href="#"><span class="ic">⚙️</span> Settings</a>
+    </nav>
+    <div class="promo"><span class="truck">🚛</span><b>Efficient supply chains create stronger businesses.</b>Keep every link of your chain visible, measured and on time.</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>Supply Chain <span class="hl">Dashboard</span></h1>
+        <p>Smarter supply chains. Lower costs. Higher efficiency. Track your end-to-end supply chain performance in real time.</p>
+      </div>
+      <div class="filters">
+        <div class="fld"><label>Date Range</label><select><option>Jan 1, 2025 – May 31, 2025</option><option>Last 30 days</option><option>Last quarter</option></select></div>
+        <div class="fld"><label>Region</label><select><option>All Regions</option><option>North America</option><option>Europe</option><option>Asia Pacific</option></select></div>
+        <div class="fld"><label>Product Category</label><select><option>All Categories</option><option>Electronics</option><option>Furniture</option><option>Apparel</option></select></div>
+        <div class="fld"><label>Supplier</label><select><option>All Suppliers</option><option>Global Supplies Ltd.</option><option>Prime Logistics</option></select></div>
+        <button class="btn" onclick="window.print()">⬇ Download Report</button>
+      </div>
+    </div>
+
+    <section class="kpis">
+      <div class="kpi"><span class="ic">🧾</span><div><div class="lb">Total Orders</div><div class="vl">12,486</div><div class="dl">▲ 6.4% vs last month</div></div></div>
+      <div class="kpi"><span class="ic">💵</span><div><div class="lb">Total Revenue</div><div class="vl">$4,892,360</div><div class="dl">▲ 12.6% vs last month</div></div></div>
+      <div class="kpi"><span class="ic">💸</span><div><div class="lb">Total Cost</div><div class="vl">$3,124,580</div><div class="dl">▲ 7.3% vs last month</div></div></div>
+      <div class="kpi"><span class="ic">⏱️</span><div><div class="lb">On-Time Delivery</div><div class="vl">92.7%</div><div class="dl">▲ 4.8% vs last month</div></div></div>
+      <div class="kpi"><span class="ic">🔄</span><div><div class="lb">Inventory Turnover</div><div class="vl">6.8</div><div class="dl">▲ 11.2% vs last month</div></div></div>
+      <div class="kpi"><span class="ic">📈</span><div><div class="lb">Order Fill Rate</div><div class="vl">96.4%</div><div class="dl">▲ 2.5% vs last month</div></div></div>
+    </section>
+
+    <div class="content">
+      <section class="cards">
+        <div class="card wide">
+          <h3>📊 Demand vs. Supply Trend</h3>
+          <div class="chart-box"><canvas id="chDemand"></canvas></div>
+          <p class="note">Demand increased by 12.6% compared to last month, while supply grew by 10.4%. Keep monitoring supply levels for the coming months.</p>
+        </div>
+
+        <div class="card">
+          <h3>🍩 Inventory Distribution by Region</h3>
+          <div class="chart-box sm"><canvas id="chInvDist"></canvas></div>
+          <p class="note">Total inventory <b>$2.8M</b>. North America holds the largest share at 32%, followed by Europe at 24%.</p>
+        </div>
+
+        <div class="card">
+          <h3>🏆 Supplier Performance</h3>
+          <table>
+            <tr><th>Supplier</th><th>On-Time</th><th>Quality</th><th>Orders</th></tr>
+            <tr><td>Global Supplies Ltd.</td><td>98.5%<div class="bar"><i style="width:98.5%"></i></div></td><td>99.2%</td><td>2,486</td></tr>
+            <tr><td>Prime Logistics</td><td>93.7%<div class="bar"><i style="width:93.7%"></i></div></td><td>97.5%</td><td>1,982</td></tr>
+            <tr><td>TechSource Inc.</td><td>91.2%<div class="bar"><i style="width:91.2%"></i></div></td><td>95.8%</td><td>1,764</td></tr>
+            <tr><td>Bright Materials</td><td>88.6%<div class="bar"><i style="width:88.6%"></i></div></td><td>94.1%</td><td>1,208</td></tr>
+            <tr><td>United Trading Co.</td><td>86.4%<div class="bar"><i style="width:86.4%"></i></div></td><td>92.7%</td><td>1,051</td></tr>
+          </table>
+          <p class="note">Global Supplies Ltd. has the best on-time delivery and quality rate.</p>
+        </div>
+
+        <div class="card">
+          <h3>🛍️ Top Products by Sales</h3>
+          <table>
+            <tr><th>Product</th><th>Category</th><th>Units</th><th>Revenue</th><th>Growth</th></tr>
+            <tr><td>Laptop</td><td>Electronics</td><td>4,320</td><td>$962,400</td><td class="up">▲ 1.1%</td></tr>
+            <tr><td>Smartphone</td><td>Electronics</td><td>3,760</td><td>$845,200</td><td class="up">▲ 1.3%</td></tr>
+            <tr><td>Office Chair</td><td>Furniture</td><td>2,480</td><td>$501,600</td><td class="up">▲ 1.2%</td></tr>
+            <tr><td>Running Shoes</td><td>Footwear</td><td>2,130</td><td>$321,900</td><td class="up">▲ 1.7%</td></tr>
+            <tr><td>Backpack</td><td>Accessories</td><td>1,860</td><td>$147,600</td><td class="up">▲ 1.9%</td></tr>
+          </table>
+          <p class="note">Laptop generated the highest revenue with steady growth.</p>
+        </div>
+
+        <div class="card">
+          <h3>🌍 Shipping Performance</h3>
+          <div class="ship">
+            <div class="row"><span>North America</span><div class="bar"><i style="width:91.2%"></i></div><span class="pct">91.2%</span></div>
+            <div class="row"><span>Europe</span><div class="bar"><i style="width:92.8%"></i></div><span class="pct">92.8%</span></div>
+            <div class="row"><span>Asia Pacific</span><div class="bar"><i style="width:89.4%"></i></div><span class="pct">89.4%</span></div>
+            <div class="row"><span>Latin America</span><div class="bar"><i style="width:87.1%"></i></div><span class="pct">87.1%</span></div>
+            <div class="row"><span>Middle East &amp; Africa</span><div class="bar"><i style="width:85.6%"></i></div><span class="pct">85.6%</span></div>
+          </div>
+          <p class="note">On-time delivery rate by region. Asia Pacific needs attention at 89.4%.</p>
+        </div>
+
+        <div class="card">
+          <h3>💲 Logistics Cost Breakdown</h3>
+          <div class="chart-box sm"><canvas id="chLogCost"></canvas></div>
+          <p class="note">Total logistics cost <b>$1.2M</b>. Freight accounts for the largest share at 36%.</p>
+        </div>
+
+        <div class="card">
+          <h3>📦 Inventory by Category</h3>
+          <div class="chart-box sm"><canvas id="chInvCat"></canvas></div>
+          <p class="note">Electronics holds the highest inventory value at 35%.</p>
+        </div>
+
+        <div class="card">
+          <h3>⏳ Order Fulfillment Cycle Time</h3>
+          <div class="chart-box sm"><canvas id="chCycle"></canvas></div>
+          <p class="note">Average fulfillment time improved steadily from 4.2 days in January to 3.9 days in May 2025.</p>
+        </div>
+
+        <div class="card wide">
+          <h3>💹 Cost vs. Revenue Trend</h3>
+          <div class="chart-box"><canvas id="chCostRev"></canvas></div>
+          <p class="note">Revenue grew 12.6% while costs grew 7.3% — margin keeps widening month over month.</p>
+        </div>
+      </section>
+
+      <div class="rail">
+        <div class="card">
+          <h3>🔔 Alerts &amp; Notifications</h3>
+          <div class="alert"><span class="dot" style="background:#dc2626"></span><div><b>Stock Low Alert</b><p>SKU-4521 at WH-04 Chicago is below threshold — only 22% remaining. Reorder soon.</p></div></div>
+          <div class="alert"><span class="dot" style="background:#f5a800"></span><div><b>Late Shipment</b><p>Shipment SHP-2024-0891 delayed by 2 days. Carrier notified, new ETA shared.</p></div></div>
+          <div class="alert"><span class="dot" style="background:#f5a800"></span><div><b>Supplier Quality Issue</b><p>Bright Materials defect rate trending up. Quality review scheduled.</p></div></div>
+          <div class="alert"><span class="dot" style="background:#16a34a"></span><div><b>High Demand Forecast</b><p>Electronics demand expected to increase by 15% next month. Plan safety stock.</p></div></div>
+        </div>
+        <div class="card">
+          <h3>💡 Key Insights &amp; Recommendations</h3>
+          <div class="insight"><span class="ck">✔</span><span>Focus on improving on-time delivery for the Asia Pacific region.</span></div>
+          <div class="insight"><span class="ck">✔</span><span>Increase safety stock for high-demand products before peak season.</span></div>
+          <div class="insight"><span class="ck">✔</span><span>Reduce logistics cost by optimizing freight routes and consolidation.</span></div>
+          <div class="insight"><span class="ck">✔</span><span>Monitor supplier quality closely for Bright Materials.</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const AMBER=['#f5a800','#e09500','#ffc21c','#d97706','#b45309'];
+const grid={color:'#f0e6cf'};
+const ticks={color:'#8a7a5c',font:{size:10}};
+
+new Chart(document.getElementById('chDemand'),{type:'bar',
+ data:{labels:['Jan 2025','Feb 2025','Mar 2025','Apr 2025','May 2025'],
+ datasets:[
+  {label:'Demand',data:[10400,11800,12100,14100,15100],backgroundColor:'#f5a800',borderRadius:6,order:2},
+  {label:'Supply',data:[9800,10900,11500,12900,13800],type:'line',borderColor:'#64748b',backgroundColor:'#64748b',tension:.35,pointRadius:4,order:1}
+ ]},
+ options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}}},
+ scales:{y:{grid,ticks:{...ticks,callback:v=>(v/1000)+'K'}},x:{grid:{display:false},ticks}}}});
+
+new Chart(document.getElementById('chInvDist'),{type:'doughnut',
+ data:{labels:['North America 32%','Europe 24%','Asia Pacific 18%','Latin America 15%','Middle East & Africa 11%'],
+ datasets:[{data:[809000,677000,504000,420000,308000],backgroundColor:['#f5a800','#e09500','#ffc21c','#d97706','#a16207'],borderWidth:2,borderColor:'#fff'}]},
+ options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:10},padding:10}}}}});
+
+new Chart(document.getElementById('chLogCost'),{type:'doughnut',
+ data:{labels:['Freight 36%','Warehousing 20%','Fuel 15%','Handling 12%','Transportation 9%','Other 8%'],
+ datasets:[{data:[432000,240000,180000,144000,108000,96000],backgroundColor:['#f5a800','#e09500','#ffc21c','#d97706','#b45309','#92400e'],borderWidth:2,borderColor:'#fff'}]},
+ options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:10},padding:8}}}}});
+
+new Chart(document.getElementById('chInvCat'),{type:'bar',
+ data:{labels:['Electronics','Furniture','Apparel','Footwear','Accessories'],
+ datasets:[{data:[980000,560000,504000,420000,336000],backgroundColor:'#f5a800',borderRadius:6}]},
+ options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+ scales:{x:{grid,ticks:{...ticks,callback:v=>'$'+(v/1000)+'K'}},y:{grid:{display:false},ticks:{...ticks,font:{size:11}} }}}});
+
+new Chart(document.getElementById('chCycle'),{type:'line',
+ data:{labels:['Jan','Feb','Mar','Apr','May'],
+ datasets:[{label:'Avg. days',data:[4.2,4.1,4.0,4.0,3.9],borderColor:'#e09500',backgroundColor:'rgba(245,168,0,.15)',fill:true,tension:.35,pointRadius:4,pointBackgroundColor:'#e09500'}]},
+ options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+ scales:{y:{min:3.4,max:4.6,grid,ticks},x:{grid:{display:false},ticks}}}});
+
+new Chart(document.getElementById('chCostRev'),{type:'bar',
+ data:{labels:['Jan 2025','Feb 2025','Mar 2025','Apr 2025','May 2025'],
+ datasets:[
+  {label:'Revenue',data:[812360,884200,942500,1026300,1227000],backgroundColor:'#f5a800',borderRadius:6},
+  {label:'Cost',data:[560000,590400,612800,655300,706080],backgroundColor:'#cbd5e1',borderRadius:6}
+ ]},
+ options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}}},
+ scales:{y:{grid,ticks:{...ticks,callback:v=>'$'+(v/1000)+'K'}},x:{grid:{display:false},ticks}}}});
+</script>
+</body>
+</html>
